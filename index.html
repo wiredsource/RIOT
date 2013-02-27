@@ -1,66 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Riot by RIOT-OS</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Riot : RIOT OS -  The revolutionary IoT OS" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Riot</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">Riot</h1>
-        <p class="header">RIOT OS -  The revolutionary IoT OS</p>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/RIOT-OS/RIOT/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/RIOT-OS/RIOT/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/RIOT-OS/RIOT">View On GitHub</a></li>
-        </ul>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/RIOT-OS/RIOT">View on GitHub</a>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/RIOT-OS">RIOT-OS</a></p>
+          <h1 id="project_title">Riot</h1>
+          <h2 id="project_tagline">RIOT OS -  The revolutionary IoT OS</h2>
 
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/RIOT-OS/RIOT/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/RIOT-OS/RIOT/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
 
-      </header>
-      <section>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h1>RIOT OS</h1>
 
 <p>RIOT - The revolutionary IoT OS!</p>
 
-<p>RIOT OS is an operating system for Internet of Things (IoT) devices. It is basesed on a microkernel and designed for</p>
+<h2>Developer friendly</h2>
 
 <ul>
-<li>energy efficiency</li>
-<li>hardware independent development</li>
-<li>a high degree of modularity</li>
-</ul><p>Its features comprise</p>
+<li>program in C or C++ like you're used to</li>
+</ul><p>a complete hello world application looks like this:</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(void) {
+    puts("Hello world!\n");
+    while(1);
+}
+</code></pre>
 
 <ul>
-<li>a preemptive, tickless scheduler with priorities</li>
-<li>flexible memory managment</li>
-<li>high resolution timers</li>
-<li>virtual, long-term timers</li>
+<li>standard development tools like gcc, gdb, or ...</li>
+<li>minimized hardware dependent code</li>
+<li>zero learning curve embedded programming</li>
+</ul><h2>Performance</h2>
+
+<ul>
+<li>increased robustness due to the microkernel architecture</li>
+<li>the tickless scheduler enables maximum energy-efficiency</li>
+<li>low interrupt latency and priority based scheduling make RIOT real-time capable</li>
+<li>minimum threading overhead</li>
+<li>100% modular structure allows RIOT to run on tiny platforms as well as on more powerful systems</li>
+</ul><h2>Features</h2>
+
+<ul>
+<li>IoT network stack
+
+<ul>
+<li>6LoWPAN</li>
+<li>IPv6</li>
+<li>RPL</li>
+<li>TCP and UDP</li>
+</ul>
+</li>
+<li>flexible memory managment (static and dynamic memory allocation)</li>
+<li>high resolution and long-term timers</li>
 <li>FAT file system</li>
 <li>logging system</li>
 <li>Wiselib support (C++ algorithm library, including routing, clustering, timesync, localization, security and more algorithms)</li>
-<li>IPv6</li>
-<li>TCP and UDP</li>
-<li>6LoWPAN</li>
-<li>RPL</li>
 </ul>
       </section>
-      <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Riot maintained by <a href="https://github.com/RIOT-OS">RIOT-OS</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+
+    
+
   </body>
 </html>
