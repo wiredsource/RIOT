@@ -333,7 +333,8 @@ Full-Width Styles
 
 #toc {
   margin-left: 2em;
-  background: #ccc;
+  padding-left: .3em;
+  background: #fff;
 }
 
 .zip_download_link {
