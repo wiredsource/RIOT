@@ -332,6 +332,7 @@ Full-Width Styles
 }
 
 #toc {
+  margin-left: 2em;
   background: #ccc;
 }
 
