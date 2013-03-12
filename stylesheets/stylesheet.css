@@ -413,6 +413,12 @@ Small Device Styles
     max-width: 480px;
   }
 
+  #riot_logo img {
+    border: 0;
+    box-shadow: none;
+    max-width: 100px;
+  }
+
   #project_title {
   font-size: 32px;
   }
