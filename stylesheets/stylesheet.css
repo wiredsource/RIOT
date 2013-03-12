@@ -295,14 +295,20 @@ Full-Width Styles
 #riot_logo {
   display: box;
   position: absolute;
-  top: 0;
-  left 10px;
+  top: 10px;
+  left 30px;
   z-index: 10;
 }
 
 #riot_logo img {
   border: 0;
   box-shadow: none;
+}
+
+#riot_title {
+  border: 0;
+  box-shadow: none;
+  width: 200px;
 }
 
 #header_wrap {
@@ -411,6 +417,12 @@ Small Device Styles
   .inner {
     min-width: 320px;
     max-width: 480px;
+  }
+
+  #riot_logo img {
+    border: 0;
+    box-shadow: none;
+    max-width: 100px;
   }
 
   #project_title {
