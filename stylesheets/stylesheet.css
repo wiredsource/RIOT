@@ -293,7 +293,7 @@ Full-Width Styles
 }
 
 #riot_logo {
-  display: block;
+  display: box;
   position: absolute;
   top: 0;
   left 10px;
