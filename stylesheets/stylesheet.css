@@ -302,6 +302,7 @@ Full-Width Styles
 
 #riot_logo img {
   border: 0;
+  box-shadow: none;
 }
 
 #header_wrap {
