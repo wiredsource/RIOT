@@ -308,7 +308,7 @@ Full-Width Styles
 #riot_title {
   border: 0;
   box-shadow: none;
-  width: 100%;
+  width: 200px;
 }
 
 #header_wrap {
