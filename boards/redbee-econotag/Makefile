@@ -29,13 +29,8 @@ $(BINDIR)%.o: %.c
 
 # remove compilation products
 clean:
-<<<<<<< HEAD
 	"$(MAKE)" -C drivers clean
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
-=======
-	${MAKE} -C drivers clean
-	rm -f $(OBJ) $(DEP)
->>>>>>> fix for the redbee-econotag Makefile to work again
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
 	fi

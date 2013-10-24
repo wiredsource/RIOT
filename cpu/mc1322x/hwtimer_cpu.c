@@ -76,6 +76,11 @@ void timer_x_init(volatile struct TMR_struct* const TMRx) {
     TMRx->CTRLbits.DIR = 0x00;                  /* count up */
     TMRx->CTRLbits.CO_INIT = 0x00;              /* other counters cannot force a reinitialization of this counter*/
     TMRx->CTRLbits.OUTPUT_MODE = 0x00;          /* OFLAG is asserted while counter is active */
+<<<<<<< HEAD
+=======
+    
+    TMRx->ENBL = 0xf;                           /* enable all the timers --- why not? */
+>>>>>>> change to the mc1322x IRQ handling
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
@@ -91,8 +96,12 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
     timer_x_init(TMR2);
     timer_x_init(TMR3);
 
+<<<<<<< HEAD
     register_isr(INT_NUM_TMR, &tmr_isr);
     hwtimer_arch_enable_interrupt();
+=======
+    install_irq(INT_NUM_TMR, &tmr_isr, 0);
+>>>>>>> change to the mc1322x IRQ handling
 }
 
 /*---------------------------------------------------------------------------*/
