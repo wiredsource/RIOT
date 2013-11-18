@@ -9,8 +9,19 @@
  *
  */
 
-#define MODE_SVC            0x13
-#define CPSR_MODE_BITS      0x1f
+.set CPSR_MODE_BITS, 0x1f
+
+/* Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs (program status registers) */
+.set  USR_MODE, 0x10                  /* Normal User Mode                                         */
+.set  FIQ_MODE, 0x11                  /* FIQ Processing Fast Interrupts Mode                      */
+.set  IRQ_MODE, 0x12                  /* IRQ Processing Standard Interrupts Mode                  */
+.set  SVC_MODE, 0x13                  /* Supervisor Processing Software Interrupts Mode           */
+.set  ABT_MODE, 0x17                  /* Abort Processing memory Faults Mode                      */
+.set  UND_MODE, 0x1B                  /* Undefined Processing Undefined Instructions Mode         */
+.set  SYS_MODE, 0x1F                  /* System Running Priviledged Operating System Tasks  Mode  */
+
+.set  IRQ_DISABLE, 0x80          /* when I bit is set, IRQ is disabled (program status registers) */
+.set  FIQ_DISABLE, 0x40          /* when F bit is set, FIQ is disabled (program status registers) */
 
  .global _startup
  _startup: b    reset
@@ -31,56 +42,47 @@ _irq: .word irq
 _fiq: .word fiq
 _pad: .word 0x87654321
 
-.global _end_vect
-_end_vect:
-    .balignl 16, 0xdeadbeef
-
-.global _TEXT_BASE
-_TEXT_BASE:
-    .word CONFIG_SYS_TEXT_BASE
-
-.global _bss_start_ofs
-_bss_start_ofs:
-    .word __bss_start - _start
-
-.global _bss_end_ofs
-_bss_end_ofs:
-    .word __bss_end - _start
-
-.global _end_ofs
-_end_ofs:
-    .word _end - _start
-
-.global IRQ_STACK_START
-IRQ_STACK_START:
-    .word 0x0badc0de
-
-.global FIQ_STACK_START
-FIQ_STACK_START:
-    .word 0x0badc0de
-
-.global IRQ_STACK_START_IN
-IRQ_STACK_START_IN:
-    .word 0x0badc0de
-
 /*
  * reset code
  */
 reset:
-    bl save_boot_params
-    /* disable FIQ and IRQ, set cpu to SVC32 mode (not if in HYP mode) */
+    /* FIQ mode stack */
+    msr CPSR_c, #(FIQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__fiq_stack_top__  /* set the FIQ stack pointer */
+
+    /* IRQ mode stack */
+    msr CPSR_c, #(IRQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__irq_stack_top__  /* set the IRQ stack pointer */
+
+    /* Supervisor mode stack */
+    msr CPSR_c, #(SVC_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__svc_stack_top__  /* set the SVC stack pointer */
+
+    /* Undefined mode stack */
+    msr CPSR_c, #(UND_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr  sp, =__und_stack_top__  /* set the UND stack pointer */
+
+    /* Abort mode stack */
+    msr CPSR_c, #(ABT_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__abt_stack_top__  /* set the ABT stack pointer */
+
+    /* System mode stack */
+    msr CPSR_c, #(SYS_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__sys_stack_top__  /* set the SYS stack pointer */
+    
+    /* disable FIQ and IRQ, set cpu to SYS mode (not if in HYP mode) */
     mrs     r0, cpsr
     and     r1, r0, #CPSR_MODE_BITS /* mask mode bits */
     teq     r1, #0x1a               /* test if HYP mode */
     bicne   r0, r0, #CPSR_MODE_BITS /* clear all mode bits */
-    orrne   r0, r0, #MODE_SVC       /* set SVC mode */
+    orrne   r0, r0, #SYS_MODE       /* set SYS mode */
     orr     r0, r0, #0xc0           /* disable FIQ and IRQ */
     msr     cpsr, r0
 
     bl      cpu_init_cp15
-    bl      cpu_init_crit
+    bl      bootloader
 
-    bl      _main
+    b       kernel_init
 
 ENTRY(cpu_init_cp15)
     /* Invalidate L1 I/D-Cache */
@@ -121,20 +123,11 @@ ENTRY(c_runtime_cpu_setup)
     mcr     p15, 0, r0, c7, c5, 4   /* ISB */
 
     /* set vector address in cp15 VBAR reg */
-    ldr     r0 = _start
+    ldr     r0 ,=_start
     mcr     p15, 0, r0, c12, c0, 0  /* set VBAR */
 
     bx      lr                      /* back to caller */
 ENDPROC(c_runtime_cpu_setup)
-
-/*
- * void save_boot_params ( uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3 )
- * __attribute__((weak));
- */
-ENTRY(save_boot_params)
-    bx      lr                      /* back to caller */
-ENDPROC(save_boot_params)
-    .weak   save_boot_params
 
 /*
  * Concerning Interrupt Handling
@@ -215,9 +208,10 @@ ENDPROC(save_boot_params)
  */
     .align 5
 undefined_instruction:
-    bad_get_stack
-    bad_save_user_regs
-    bl handle_undefined_instruction
+    /* bad_get_stack
+     * bad_save_user_regs
+     * bl handle_undefined_instruction */
+    .word UNDEF_Routine
 
     .align 5
 software_interrupt:
@@ -227,21 +221,23 @@ software_interrupt:
 
     .align 5
 prefetch_abort:
-    bad_get_stack
-    bad_save_user_regs
-    bl handle_prefetch_abort
+    /* bad_get_stack
+     * bad_save_user_regs
+     * bl handle_prefetch_abort */
+    .word PABT_Routine 
 
     .align 5
 data_abort:
-    bad_get_stack
-    bad_save_user_regs
-    bl  handle_data_abort
+    /* bad_get_stack
+     * bad_save_user_regs
+     * bl  handle_data_abort */
+     .word DABT_Routine
 
     .align 5
 not_used:
-    bad_get_stack
-    bad_save_user_regs
-    bl handle_not_used
+    /* bad_get_stack
+     * bad_save_user_regs
+     * bl handle_not_used */
 
     .align 5
 irq:
@@ -252,7 +248,9 @@ irq:
 
     .align 5
 fiq:
-    fiq_get_stack
-    irq_save_user_regs              /* maybe replace with "super low latency" fiq_save_user_regs */
-    bl handle_fiq
-    irq_restore_user_regs
+    /* fiq_get_stack
+     * irq_save_user_regs              /* maybe replace with "super low latency" fiq_save_user_regs */
+     * bl handle_fiq
+     * irq_restore_user_regs */
+    
+    .aling 5
