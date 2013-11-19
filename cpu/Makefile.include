@@ -14,3 +14,10 @@ endif
 ifeq ($(CPU),native)
   export INCLUDES += -I$(RIOTBASE)/cpu/native/include
 endif
+ifeq ($(CPU),tegra2)
+  export USEMODULE += armv7_common tegra_common
+  export UNDEF += $(BINDIR)syscalls.o
+  export UNDEF += $(BINDIR)tegra2_syscalls.o
+  export INCLUDES += -I$(RIOTCPU)/armv7_common/include
+  export INCLUDES += -I$(RIOTCPU)/tegra_common/include
+endif

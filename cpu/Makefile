@@ -18,6 +18,10 @@ ifeq ($(CPU),native)
  DIRS = native
 endif
 
+ifeq ($(CPU),tegra2)
+ DIRS = armv7_common tegra_common tegra2
+endif
+
 .PHONY: cpus
 .PHONY: $(DIRS)
 
@@ -35,3 +39,6 @@ clean:
 	@"$(MAKE)" -C msp430-common clean
 	@"$(MAKE)" -C msp430x16x clean
 	@"$(MAKE)" -C native clean
+	@"$(MAKE)" -C armv7_common clean
+	@"$(MAKE)" -C tegra_common clean
+	@"$(MAKE)" -C tegra2 clean

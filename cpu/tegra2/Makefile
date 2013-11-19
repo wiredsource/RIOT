@@ -1,6 +1,5 @@
 MODULE =cpu
 
-INCLUDES = -Iinclude -Idrivers/include -I../armv7_common/include -I../tegra_common/include
 DIRS =
 ifneq (,$(findstring module,$(USEMODULE)))
 	DIRS += module
