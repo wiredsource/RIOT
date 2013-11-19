@@ -11,10 +11,6 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_startup)
-MEMORY
-{
-    /* TODO: define memory locations */
-}
 SECTIONS
 {
     /* TODO: can be increased */
@@ -32,38 +28,26 @@ SECTIONS
     .text :
     {
         *(.startup)
-        *(.irq)
         *(.text*)
     }
-
-    . = ALIGN(4);
     PROVIDE (__etext = .);
     PROVIDE (_etext = .);
     PROVIDE (etext = .);
+    
+    . = ALIGN(4);
     .rodata : 
     {
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.rodata*)))
     }
 
     . = ALIGN(4);
-    .rel.dyn :
-    {
-        __rel_dyn_start = .;
-        *(.rel*)
-        __rel_dyn_end = .;
-    }
-
-    .dynsym :
-    {
-        __dynsym_start = .;
-        *(.dynsym)
-    }
     .data :
     {
+        _data = . ;
         *(.data*)
     }
     _edata = .; PROVIDE (edata = .);
-
+    
   	.stack : {
   		__stack_start__ = . ;
 
@@ -97,42 +81,49 @@ SECTIONS
     . = ALIGN(4);
     . = .;
 
+    . = ALIGN(4);
+    .rel.dyn :
+    {
+        __rel_dyn_start = .;
+        *(.rel*)
+        __rel_dyn_end = .;
+    }
+
+    .dynsym :
+    {
+        __dynsym_start = .;
+        *(.dynsym)
+    }
+
     _end = .;
 
     .bss_start __rel_dyn_start (OVERLAY) :
     {
         KEEP(*(.__bss_start));
         __bss_start = .;
-        __bss_start__ = .;
     }
 
-    .bss __bss_base (OVERLAY) :
+    .bss __bss_start (OVERLAY) :
     {
         *(.bss*)
         . = ALIGN(4);
-        __bss_limit = .;
+        __bss_end = .;
     }
 
-    .bss_end __bss_limit (OVERLAY) :
+    .bss_end __bss_end (OVERLAY) :
     {
         KEEP(*(.__bssend));
-        __bss_end = . ;
-        __bss_end__ = . ;
     }
     
-    .heap : {
-                 __heap_start__ = . ; PROVIDE(__heap_start = .);
-                 *(.heap);
-                 . += HEAP_SIZE;
-                 . = ALIGN (4);
-                 __heap_end__ = . ;  PROVIDE(__heap_end = .);
+    .heap : 
+    {
+        __heap_start__ = . ; PROVIDE(__heap_start = .);
+        *(.heap);
+        . += HEAP_SIZE;
+        . = ALIGN (4);
+        __heap_end__ = . ;  PROVIDE(__heap_end = .);
     }
 
-    . = ALIGN(32 / 8);
-    __end__ = . ;
-    _end = .; PROVIDE (end = .);
-    . = DATA_SEGMENT_END (.);
-    
     /DISCARD/ : { *(.dynstr*) }
     /DISCARD/ : { *(.dynamic*) }
     /DISCARD/ : { *(.plt*) }
