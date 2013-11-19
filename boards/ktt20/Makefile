@@ -30,7 +30,7 @@ $(BINDIR)%.o: %.c
 # remove compilation products
 clean:
 	${MAKE} -C drivers clean
-	rm -f $(OBJ) $(DEP)
+	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
 	fi

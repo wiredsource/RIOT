@@ -20,8 +20,3 @@ void bl_init_ports(void)
 {
     // dummy to compile
 }
-
-int bl_uart_init(void)
-{
-    //
-}
