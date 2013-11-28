@@ -16,7 +16,7 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-FLASHER = mc1322x-load.pl
+FLASHER = $(RIOTBOARD)/$(BOARD)/tools/nvflash
 TERM = pyterm.py
 LINKFLAGS = -mcpu=cortex-a9 -static -lgcc -nostartfiles -T$(RIOTCPU)/$(CPU)/tegra2.lds
 
@@ -24,5 +24,7 @@ ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export HEXFILE = bin/$(PROJECT).hex
-export FFLAGS = 
+NV_BCT_FILE = $(RIOTBOARD)/$(BOARD)/tools/ktt20.bct
+NV_CFG_FILE = $(RIOTBOARD)/$(BOARD)/tools/ktt20.cfg
+export FFLAGS = --bct $(NV_BCT_FILE) --setbct --configfile $(NV_CFG_FILE) --bl $(HEXFILE) --go
 export OFLAGS = -O binary --gap-fill=0xff

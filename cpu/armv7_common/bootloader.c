@@ -43,21 +43,21 @@ void IRQ_Routine(void)
 {
     printf("Kernel Panic,\nEarly IRQ call\n");
 
-    while (1) {};
+    //while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void FIQ_Routine(void)
 {
     printf("Kernel Panic,\nEarly FIQ call\n");
 
-    while (1) {};
+    //while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void SWI_Routine(void)
 {
     printf("Kernel Panic,\nEarly SWI call\n");
 
-    while (1) {};
+    //while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void DEBUG_Routine(void)
@@ -137,26 +137,26 @@ bl_init_data(void)
     extern unsigned int _edata;
     extern unsigned int __bss_start;
     extern unsigned int __bss_end;
-
+ 
     register unsigned int *p1;
     register unsigned int *p2;
     register unsigned int *p3;
-
+ 
     // initialize data from flash
     // (linker script ensures that data is 32-bit aligned)
     p1 = &_etext;
     p2 = &_data;
     p3 = &_edata;
-
+ 
     while (p2 < p3) {
         *p2++ = *p1++;
     }
-
+ 
     // clear bss
     // (linker script ensures that bss is 32-bit aligned)
     p1 = &__bss_start;
     p2 = &__bss_end;
-
+ 
     while (p1 < p2) {
         *p1++ = 0;
     }
@@ -174,7 +174,7 @@ void bootloader(void)
     bl_init_clks();
 
     /* initialize bss and data */
-    bl_init_data();
+    //bl_init_data();
 
     /* board specific setup of i/o pins */
     bl_init_ports();

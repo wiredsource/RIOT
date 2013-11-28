@@ -128,6 +128,6 @@ int fw_puts(char *astring, int length)
 
 int bl_uart_init(void)
 {
-    ktt20_uart_init(3, 115200);
+    ktt20_uart_init(2, 115200);
     return 1;
 }

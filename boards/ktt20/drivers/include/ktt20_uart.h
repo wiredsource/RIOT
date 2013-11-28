@@ -6,6 +6,8 @@
  * Version 2.  See the file LICENSE for more details.
  */
 
+#include <stdint.h>
+
 #define UART0_BASE			( 0x70006000UL )			/* nVidia Tegra 2 - UART A */
 #define UART1_BASE			( 0x70006040UL )			/* nVidia Tegra 2 - UART B */
 #define UART2_BASE			( 0x70006200UL )			/* nVidia Tegra 2 - UART C */

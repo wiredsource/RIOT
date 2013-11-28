@@ -23,10 +23,10 @@
 .set  IRQ_DISABLE, 0x80          /* when I bit is set, IRQ is disabled (program status registers) */
 .set  FIQ_DISABLE, 0x40          /* when F bit is set, FIQ is disabled (program status registers) */
 
-.section .startup
-.func _startup
-.global _startup
-_startup: b    reset
+.section .vectors
+.global _vectors
+_vectors: 
+    ldr pc, _reset_addr
     ldr pc, _undefined_instruction
     ldr pc, _software_interrupt
     ldr pc, _prefetch_abort
@@ -35,6 +35,7 @@ _startup: b    reset
     ldr pc, _irq
     ldr pc, _fiq
 
+_reset_addr: .word reset_handler
 _undefined_instruction: .word UNDEF_Routine
 _software_interrupt: .word ctx_switch
 _prefetch_abort: .word PABT_Routine
@@ -42,219 +43,152 @@ _data_abort: .word DABT_Routine
 _not_used: .word not_used
 _irq: .word arm_irq_handler
 _fiq: .word fiq
-_pad: .word 0xdeadbeef
+
 
 /*
  * reset code
  */
-reset:
-    /* FIQ mode stack */
-    msr CPSR_c, #(FIQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
-    ldr sp, =__fiq_stack_top__  /* set the FIQ stack pointer */
-
-    /* IRQ mode stack */
-    msr CPSR_c, #(IRQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
-    ldr sp, =__irq_stack_top__  /* set the IRQ stack pointer */
-
-    /* Supervisor mode stack */
-    msr CPSR_c, #(SVC_MODE | IRQ_DISABLE | FIQ_DISABLE)
-    ldr sp, =__svc_stack_top__  /* set the SVC stack pointer */
-
-    /* Undefined mode stack */
-    msr CPSR_c, #(UND_MODE | IRQ_DISABLE | FIQ_DISABLE)
-    ldr  sp, =__und_stack_top__  /* set the UND stack pointer */
-
-    /* Abort mode stack */
-    msr CPSR_c, #(ABT_MODE | IRQ_DISABLE | FIQ_DISABLE)
-    ldr sp, =__abt_stack_top__  /* set the ABT stack pointer */
-
-    /* System mode stack */
-    msr CPSR_c, #(SYS_MODE | IRQ_DISABLE | FIQ_DISABLE)
-    ldr sp, =__sys_stack_top__  /* set the SYS stack pointer */
-    
-    /* disable FIQ and IRQ, set cpu to SYS mode (not if in HYP mode) */
-    mrs     r0, cpsr
-    and     r1, r0, #CPSR_MODE_BITS /* mask mode bits */
-    teq     r1, #0x1a               /* test if HYP mode */
-    bicne   r0, r0, #CPSR_MODE_BITS /* clear all mode bits */
-    orrne   r0, r0, #SYS_MODE       /* set SYS mode */
-    orr     r0, r0, #0xc0           /* disable FIQ and IRQ */
-    msr     cpsr, r0
-
-    bl      cpu_init_cp15
-    bl      bootloader
-
-    b       kernel_init
-
-cpu_init_cp15:
-    /* Invalidate L1 I/D-Cache */
-    eor     r0, r0, r0              /* prepare r0 */
-    mcr     p15, 0, r0, c8, c7, 0   /* invalidate TLBs */
-    mcr     p15, 0, r0, c7, c5, 0   /* invalidate I-Cache */
-    mcr     p15, 0, r0, c7, c5, 6   /* invalidate BP array */
-    mcr     p15, 0, r0, c7, c10, 4  /* DSP */
-    mcr     p15, 0, r0, c7, c5, 4   /* ISB */
-
-    /* Disable MMU and chaches */
-    mrc     p15, 0, r0, c1, c0, 0   /* get it */
-    bic     r0, r0, #0x00002000     /* clear bit 13 */
-    bic     r0, r0, #0x00000007     /* clear bits 2:0 */
-    orr     r0, r0, #0x00000800     /* set bit 11 Align*/
-    orr     r0, r0, #0x00000002     /* set bit 1 BTB*/
-    orr     r0, r0, #0x00001000     /* set bit 12 I-Cache */
-    mcr     p15, 0, r0, c1, c0, 0   /* restore it */
-
-    /*
-     * TODO: 
-     * Handle ARM errata 716044, 742230, 743622, 751472 here if needed.
-     */
-
-    mov     pc, lr      /* return */
-
-@ENDPROC(cpu_init_cp15)
-
-/* Calls lowlevel_init for board specific init */
-@ENTRY(cpu_init_crit)
-@    b       lowlevel_init           /* shall setup pll, mux, memory */
-@ENDPROC(cpu_init_crit)
-
-@ENTRY(c_runtime_cpu_setup)
-@    /* Invalidate I-Cache */
-@    mcr     p15, 0, r0, c7, c5, 0   /* invalidate I-cache */
-@    mcr     p15, 0, r0, c7, c10, 4  /* DSB */
-@    mcr     p15, 0, r0, c7, c5, 4   /* ISB */
-@
-@    /* set vector address in cp15 VBAR reg */
-@    ldr     r0 ,=_start
-@    mcr     p15, 0, r0, c12, c0, 0  /* set VBAR */
-@
-@    bx      lr                      /* back to caller */
-@ENDPROC(c_runtime_cpu_setup)
+reset_handler:
 
 /*
- * Concerning Interrupt Handling
+ * Disable caches, MMU and branch prediction in case they were left 
+ * enabled from an earlier run
  */
-@#define STACK_FRAME_SIZE    0x48
-@#define STACK_PC            0x3c
-@#define STACK_SP            0x34
+    MRC     p15, 0, r0, c1, c0, 0       @ Read CP15 System Control register
+    BIC     r0, r0, #(0x1 << 12)        @ Clear I bit 12 to disable I Cache
+    BIC     r0, r0, #(0x1 <<  2)        @ Clear C bit  2 to disable D Cache
+    BIC     r0, r0, #0x1                @ Clear M bit  0 to disable MMU
+    BIC     r0, r0, #(0x1 << 11)        @ Clear Z bit 11 to disable branch prediction
+    MCR     p15, 0, r0, c1, c0, 0       @ Write value back to CP15 System Control register
 
-/* used for abort/prefetch/undefined/... exeptions */
-# .macro bad_save_user_regs
-#     sub     sp, sp, #STACK_FRAME_SIZE   /* get frame of current user stack */
-#     stmia   sp, {r0 - r12}              /* save user registerlist r0-r12 */
-#                                         /* in svc mode now */
-#     ldr     r2,  IRQ_STACK_START_IN     /* 2 words into abort stack */
-#     ldmia   r2, {r2 - r3}               /* get aborted pc and cpsr  */
-#     add     r0, sp, #STACK_FRAME_SIZE   /* get pointer to old stack */
-#     add     r5, sp, #STACK_SP
-#     mov     r1, lr 
-#     stmia   r5, {r0 - r3}               /* save sp_svc, lr_svc, pc, cpsr */
-#     mov     r0, sp                      /* copy current stack to r0 */
-# .endm
-# 
-# /* used for IRQ/FIQ handling */
-# .macro irq_save_user_regs
-#     sub     sp, sp, #STACK_FRAME_SIZE   /* get frame of current user stack */
-#     stmia   sp, {r0 - r12}              /* save user registers r0 - r12 */
-#     add     r8, sp, #STACK_PC           
-#     stmdb   r8, {sp, lr}^               /* save calling sp, lr */
-#     str     lr, [r8, #0x0]              /* save calling pc */
-#     mrs     r6, spsr
-#     str     r6, [r8, #0x4]              /* save cpsr */
-#     str     r0, [r8, #0x8]              /* save old r0 */
-#     mov     r0, sp 
-# .endm
-# 
-# .macro irq_restore_user_regs
-#     ldmia   sp, {r0 - lr}^              /* calling r0 - lr */
-#     mov     r0, r0                      /* one NOP for Pooh */
-#     ldr     lr, [sp, #STACK_PC]         /* get the pc */
-#     add     sp, sp, #STACK_FRAME_SIZE
-#     subs    pc, lr, #0x4                /* return and move spsr_svc into cpsr */
-# .endm
-# 
-# .macro bad_get_stack
-#     ldr     r13, IRQ_STACK_START_IN     /* setup mode stack (banked mode) */
-#     str     lr, [r13]                   /* save caller lr to saved stack */
-#     mrs     lr, spsr                    /* get spsr */
-#     str     lr, [r13, #0x4]             /* save caller spsr to saved stack */
-#     mov     r13, #MODE_SVC              /* prepare for SVC-mode */
-#     msr     spsr, r13                   /* switch to mode */
-#     mov     lr, pc                      /* get return pc */
-#     movs    pc, lr                      /* jump to next instr. and switch mode */
-# .endm
-# 
-# .macro bad_get_stack_swi
-#     sub     r13, r13, #0x4              /* one word of space in current stack */
-#     str     r0, [r13]                   /* store r0 value in stack */
-#     ldr     r0, IRQ_STACK_START_IN      /* get saved stack */
-#     str     lr, [r0]                    /* store caller lr in saved stack */
-#     mrs     lr, spsr                    /* get spsr */
-#     str     lr, [r0, #0x4]              /* store spsr in saved stack */
-#     ldr     lr, [r0]                    /* restore lr */
-#     ldr     r0, [r13]                   /* restore r0 */
-#     add     r13, r13, #0x4              /* restore stack pointer */
-# .endm
-# 
-# .macro irq_get_stack
-#     ldr     sp, IRQ_STACK_START         /* prepare IRQ stack */
-# .endm
-# 
-# .macro fiq_get_stack
-#     ldr     sp, FIQ_STACK_START         /* prepare FIQ stack */
-# .endm
+/*
+ * Invalidate Data and Instruction TLBs and branch predictor
+ */
+    MOV     r0,#0
+    MCR     p15, 0, r0, c8, c7, 0      @ I-TLB and D-TLB invalidation
+    MCR     p15, 0, r0, c7, c5, 6      @ BPIALL - Invalidate entire branch predictor array
+
+/*
+ * Set Vector Base Address Register (VBAR) to point to this applications vector table
+ */
+
+    LDR     r0, =.vectors
+    MCR     p15, 0, r0, c12, c0, 0
+
+/*
+ * Cache Invalidation code for Cortex-A9
+ */
+
+    @ Invalidate L1 Instruction Cache
+    MRC     p15, 1, r0, c0, c0, 1      @ Read Cache Level ID Register (CLIDR)
+    TST     r0, #0x3                   @ Harvard Cache?
+    MOV     r0, #0                     @ SBZ
+    MCRNE   p15, 0, r0, c7, c5, 0      @ ICIALLU - Invalidate instruction cache and flush branch target cache
+
+    @ Invalidate Data/Unified Caches
+    MRC     p15, 1, r0, c0, c0, 1      @ Read CLIDR
+    ANDS    r3, r0, #0x07000000        @ Extract coherency level
+    MOV     r3, r3, LSR #23            @ Total cache levels << 1
+    BEQ     Finished                   @ If 0, no need to clean
+
+    MOV     r10, #0                    @ R10 holds current cache level << 1
+Loop1:
+    ADD     r2, r10, r10, LSR #1       @ R2 holds cache "Set" position 
+    MOV     r1, r0, LSR r2             @ Bottom 3 bits are the Cache-type for this level
+    AND     r1, r1, #7                 @ Isolate those lower 3 bits
+    CMP     r1, #2
+    BLT     Skip                       @ No cache or only instruction cache at this level
+
+    MCR     p15, 2, r10, c0, c0, 0     @ Write the Cache Size selection register
+    ISB                                @ ISB to sync the change to the CacheSizeID reg
+    MRC     p15, 1, r1, c0, c0, 0      @ Reads current Cache Size ID register
+    AND     r2, r1, #7                 @ Extract the line length field
+    ADD     r2, r2, #4                 @ Add 4 for the line length offset (log2 16 bytes)
+    LDR     r4, =0x3FF
+    ANDS    r4, r4, r1, LSR #3         @ R4 is the max number on the way size (right aligned)
+    CLZ     r5, r4                     @ R5 is the bit position of the way size increment
+    LDR     r7, =0x7FFF
+    ANDS    r7, r7, r1, LSR #13        @ R7 is the max number of the index size (right aligned)
+
+Loop2:
+    MOV     r9, r4                     @ R9 working copy of the max way size (right aligned)
+
+Loop3:   
+    ORR     r11, r10, r9, LSL r5       @ Factor in the Way number and cache number into R11
+    ORR     r11, r11, r7, LSL r2       @ Factor in the Set number
+    MCR     p15, 0, r11, c7, c6, 2     @ Invalidate by Set/Way
+    SUBS    r9, r9, #1                 @ Decrement the Way number
+    BGE     Loop3
+    SUBS    r7, r7, #1                 @ Decrement the Set number
+    BGE     Loop2
+Skip:    
+    ADD     r10, r10, #2               @ increment the cache number
+    CMP     r3, r10
+    BGT     Loop1
+
+Finished:
+
+/*
+ * future MMU configuration and initialization should be here
+ */
+ 
+/*
+ * Setup domain control register - Enable all domains to client mode
+ */
+
+    MRC     p15, 0, r0, c3, c0, 0      @ Read Domain Access Control Register
+    LDR     r0, =0x55555555            @ Initialize every domain entry to b01 (client)
+    MCR     p15, 0, r0, c3, c0, 0      @ Write Domain Access Control Register
+    
+/*
+ * leave caches and MMU disabled
+ */
+    LDR     r12,=bootloader            @ Save this in register for possible long jump
+    ldr     r11,=kernel_init
+    MRC     p15, 0, r0, c1, c0, 0      @ Read CP15 System Control register
+    BIC     r0, r0, #(0x1 << 12)       @ Clear I bit 12 to disable I Cache
+    BIC     r0, r0, #(0x1 <<  2)       @ Clear C bit  2 to disable D Cache
+    BIC     r0, r0, #0x2               @ Clear A bit  1 to disable strict alignment fault checking
+    @ ORR     r0, r0, #0x1               @ Set M bit 0 to enable MMU before scatter loading
+    MCR     p15, 0, r0, c1, c0, 0      @ Write CP15 System Control register
+    
+    bl      enable_caches
+    
+    bl      bootloader
+    b       kernel_init
+
+
+.global enable_caches
+enable_caches:
+/*
+ * Enable caches and branch prediction
+ */
+    MRC     p15, 0, r0, c1, c0, 0      @ Read System Control Register
+    ORR     r0, r0, #(0x1 << 12)       @ Set I bit 12 to enable I Cache
+    ORR     r0, r0, #(0x1 << 2)        @ Set C bit  2 to enable D Cache
+    ORR     r0, r0, #(0x1 << 11)       @ Set Z bit 11 to enable branch prediction
+    MCR     p15, 0, r0, c1, c0, 0      @ Write System Control Register
+
+
+/*
+ * Enable L1 D-side prefetch (A9 specific)
+ */
+    MRC     p15, 0, r0, c1, c0, 1      @ Read Auxiliary Control Register
+    ORR     r0, r0, #(0x1 << 2)        @ Set DP bit 2 to enable L1 Dside prefetch
+    MCR     p15, 0, r0, c1, c0, 1      @ Write Auxiliary Control Register
+
+    BX      lr                         @ return to caller
 
 /*
  * And now for something completly different.
  * exception handlers
  */
     .align 5
-# undefined_instruction:
-#     /* bad_get_stack
-#      * bad_save_user_regs
-#      * bl handle_undefined_instruction */
-#     .word UNDEF_Routine
-# 
-#     .align 5
-# software_interrupt:
-#     # bad_get_stack_swi    
-#     # bad_save_user_regs
-#     # bl handle_software_interrupt
-#     .word ctx_switch
-# 
-#     .align 5
-# prefetch_abort:
-#     /* bad_get_stack
-#      * bad_save_user_regs
-#      * bl handle_prefetch_abort */
-#     .word PABT_Routine 
-# 
-#     .align 5
-# data_abort:
-#     /* bad_get_stack
-#      * bad_save_user_regs
-#      * bl  handle_data_abort */
-#      .word DABT_Routine
-# 
-#     .align 5
+
 not_used:
-    /* bad_get_stack
-     * bad_save_user_regs
-     * bl handle_not_used */
 
     .align 5
-# irq:
-#     # irq_get_stack
-#     # irq_save_user_regs
-#     # bl handle_irq
-#     # irq_restore_user_regs
-#     .word arm
-# 
-#     .align 5
+    
 fiq:
-    /* fiq_get_stack
-     * irq_save_user_regs              /* maybe replace with "super low latency" fiq_save_user_regs
-     * bl handle_fiq
-     * irq_restore_user_regs */
     
     .align 5
