@@ -47,14 +47,14 @@ enum {
    ACK_WAIT_TIME         =    327, // 10ms
 };
 
-void    stupidmac_init();
-error_t stupidmac_send(OpenQueueEntry_t* msg);
-void    stupidmac_sendDone(OpenQueueEntry_t* msg, error_t error);
+void    stupidmac_init(void);
+owerror_t stupidmac_send(OpenQueueEntry_t* msg);
+void    stupidmac_sendDone(OpenQueueEntry_t* msg, owerror_t error);
 void    stupidmac_packet_received(OpenQueueEntry_t* pkt);
-void    stupidmac_sendDone(OpenQueueEntry_t* packetReceived, error_t error);
-void    timer_mac_backoff_fired();
-void    timer_mac_watchdog_fired();
-void    timer_mac_periodic_fired();
-bool    stupidmac_debugPrint();
+void    stupidmac_sendDone(OpenQueueEntry_t* packetReceived, owerror_t error);
+void    timer_mac_backoff_fired(void);
+void    timer_mac_watchdog_fired(void);
+void    timer_mac_periodic_fired(void);
+bool    stupidmac_debugPrint(void);
 
 #endif

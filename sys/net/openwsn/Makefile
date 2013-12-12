@@ -12,7 +12,7 @@ DIRS += 07-App
 all:
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-include $(RIOTBASE)/Makefile.base
+include $(MAKEBASE)/Makefile.base
 
 # remove compilation products
 clean::

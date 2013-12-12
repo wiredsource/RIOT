@@ -13,14 +13,14 @@ tcpinject_vars_t tcpinject_vars;
 
 //=========================== public ==========================================
 
-void tcpinject_init() {
+void tcpinject_init(void) {
 }
 
-bool tcpinject_shouldIlisten() {
+bool tcpinject_shouldIlisten(void) {
    return FALSE;
 }
 
-void tcpinject_trigger() {
+void tcpinject_trigger(void) {
    uint8_t number_bytes_from_input_buffer;
    uint8_t input_buffer[18];
    //get command from OpenSerial (16B IPv6 destination address, 2B destination port)
@@ -81,7 +81,7 @@ void tcpinject_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 void tcpinject_receive(OpenQueueEntry_t* msg) {
 }
 
-bool tcpinject_debugPrint() {
+bool tcpinject_debugPrint(void) {
    return FALSE;
 }
 

@@ -6,14 +6,18 @@
 #include "neighbors.h"
 #include "packetfunctions.h"
 #include "openrandom.h"
-#include "scheduler.h"
+//#include "scheduler.h"
 #include "idmanager.h"
 #include "opentimers.h"
 #include "IEEE802154E.h"
 
+#include "thread.h"
+
 //=========================== variables =======================================
 
 icmpv6rpl_vars_t             icmpv6rpl_vars;
+static char openwsn_icmpv6rpl_DAO_stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char openwsn_icmpv6rpl_DIO_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototypes ======================================
 
@@ -230,7 +234,10 @@ void icmpv6rpl_receive(OpenQueueEntry_t* msg) {
    task.
 */
 void icmpv6rpl_timer_DIO_cb(void) {
-   scheduler_push_task(icmpv6rpl_timer_DIO_task,TASKPRIO_RPL);
+   //scheduler_push_task(icmpv6rpl_timer_DIO_task,TASKPRIO_RPL);
+   thread_create(openwsn_icmpv6rpl_DIO_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                  PRIORITY_OPENWSN_ICMPV6RPL, CREATE_STACKTEST, 
+                  icmpv6rpl_timer_DIO_task, "icmpv6rpl_timer_DIO_task");
 }
 
 /**
@@ -356,7 +363,10 @@ void sendDIO(void) {
    task.
 */
 void icmpv6rpl_timer_DAO_cb(void) {
-   scheduler_push_task(icmpv6rpl_timer_DAO_task,TASKPRIO_RPL);
+   //scheduler_push_task(icmpv6rpl_timer_DAO_task,TASKPRIO_RPL);
+   thread_create(openwsn_icmpv6rpl_DAO_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                  PRIORITY_OPENWSN_ICMPV6RPL, CREATE_STACKTEST, 
+                  icmpv6rpl_timer_DAO_task, "icmpv6rpl_timer_DAO_task");
 }
 
 /**

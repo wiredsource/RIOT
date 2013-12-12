@@ -7,10 +7,12 @@
 #include "opentimers.h"
 #include "openrandom.h"
 #include "opencoap.h"
-#include "scheduler.h"
+//#include "scheduler.h"
 #include "IEEE802154E.h"
 #include "idmanager.h"
 #include "neighbors.h"
+
+#include "thread.h"
 
 //=========================== defines =========================================
 
@@ -22,6 +24,8 @@ typedef struct {
 
 udplatency_vars_t udplatency_vars;
 uint16_t          seqNum;
+
+static char openwsn_udplatency_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototypes ======================================
 
@@ -116,7 +120,10 @@ void udplatency_task(void) {
 }
 
 void udplatency_timer(void) {
-  scheduler_push_task(udplatency_task,TASKPRIO_COAP);
+  //scheduler_push_task(udplatency_task,TASKPRIO_COAP);
+  thread_create(openwsn_udplatency_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                 PRIORITY_OPENWSN_UDPLATENCY, CREATE_STACKTEST, 
+                 udplatency_task, "udplatency task");
 }
 
 void udplatency_sendDone(OpenQueueEntry_t* msg, owerror_t error) {

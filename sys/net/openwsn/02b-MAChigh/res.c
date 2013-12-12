@@ -7,13 +7,17 @@
 #include "iphc.h"
 #include "packetfunctions.h"
 #include "openrandom.h"
-#include "scheduler.h"
+//#include "scheduler.h"
 #include "opentimers.h"
-#include "debugpins.h"
+//#include "debugpins.h"
+
+#include "thread.h"
+
 
 //=========================== variables =======================================
 
 res_vars_t res_vars;
+static char openwsn_res_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototypes ======================================
 
@@ -44,7 +48,8 @@ status information about several modules in the OpenWSN stack.
 
 \returns TRUE if this function printed something, FALSE otherwise.
 */
-bool debugPrint_myDAGrank(void) {
+// TODO: was bool but complained "conflicting types"
+uint8_t debugPrint_myDAGrank(void) {
    uint16_t output=0;
    output = neighbors_getMyDAGrank();
    openserial_printStatus(STATUS_DAGRANK,(uint8_t*)&output,sizeof(uint16_t));
@@ -450,5 +455,8 @@ port_INLINE void sendKa(void) {
 }
 
 void res_timer_cb(void) {
-   scheduler_push_task(timers_res_fired,TASKPRIO_RES);
+   // scheduler_push_task(timers_res_fired,TASKPRIO_RES);
+   thread_create(openwsn_res_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                 PRIORITY_OPENWSN_RES, CREATE_STACKTEST, 
+                 timers_res_fired, "timers res fired");
 }

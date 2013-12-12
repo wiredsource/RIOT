@@ -17,11 +17,11 @@ typedef struct{
    uint8_t rsvp_timer_id;
 }rsvp_vars_t;
 
-void rsvp_timer_cb();
+void rsvp_timer_cb(void);
 
 rsvp_vars_t rsvp_vars;
 
-void rsvp_init(){
+void rsvp_init(void){
    rsvp_vars.rsvp_period    = 0;
    rsvp_vars.rsvp_timer_id  = 0;
 }
@@ -37,6 +37,10 @@ void rsvp_qos_request(uint8_t bandwith, uint16_t refresh_period, open_addr_t des
       OpenQueueEntry_t* pkt;
       owerror_t           outcome;
       uint8_t           i,j;
+      
+      (void)outcome;
+      (void)i;
+      (void)j;
      
       pkt = openqueue_getFreePacketBuffer(COMPONENT_RSVP);
       if (pkt==NULL) {

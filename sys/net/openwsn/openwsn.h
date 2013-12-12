@@ -12,7 +12,18 @@
 #include <stdint.h>               // needed for uin8_t, uint16_t
 #include "board_info.h"
 
+#include <stdbool.h>
+#include "kernel.h"
+
 //=========================== define ==========================================
+
+#define PRIORITY_OPENWSN_RES        PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN_ICMPV6RPL  PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN_COAP       PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN_OPENTCP    PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN_UDPLATENCY PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN_UDPRAND    PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN_UDPSTORM   PRIORITY_MAIN-1
 
 static const uint8_t infoStackName[] = "OpenWSN ";
 #define OPENWSN_VERSION_MAJOR     1
@@ -254,7 +265,7 @@ enum {
 typedef uint16_t  errorparameter_t;
 typedef uint16_t  dagrank_t;
 typedef uint8_t   owerror_t;
-#define bool uint8_t
+//#define bool uint8_t
 
 //PRAGMA(pack(1));
 typedef struct {

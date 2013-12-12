@@ -7,11 +7,14 @@
 #include "packetfunctions.h"
 #include "idmanager.h"
 #include "opentimers.h"
-#include "scheduler.h"
+//#include "scheduler.h"
+
+#include "thread.h"
 
 //=========================== variables =======================================
 
 opencoap_vars_t opencoap_vars;
+static char openwsn_coap_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototype =======================================
 
@@ -43,7 +46,7 @@ void opencoap_receive(OpenQueueEntry_t* msg) {
    coap_option_t             last_option;
    coap_resource_desc_t*     temp_desc;
    bool                      found;
-   owerror_t                   outcome;
+   owerror_t                 outcome = 0;
    // local variables passed to the handlers (with msg)
    coap_header_iht           coap_header;
    coap_option_iht           coap_options[MAX_COAP_OPTIONS];
@@ -354,5 +357,8 @@ owerror_t opencoap_send(OpenQueueEntry_t*     msg,
 //=========================== private =========================================
 
 void icmpv6coap_timer_cb(void) {
-   scheduler_push_task(timers_coap_fired,TASKPRIO_COAP);
+   //scheduler_push_task(timers_coap_fired,TASKPRIO_COAP);
+   thread_create(openwsn_coap_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                  PRIORITY_OPENWSN_COAP, CREATE_STACKTEST, 
+                  timers_coap_fired, "timers coap fired");
 }

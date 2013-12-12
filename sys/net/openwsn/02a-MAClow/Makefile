@@ -7,7 +7,8 @@ INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/03b-IPv6
 INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/04-TRAN
 INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/cross-layers
 
-DIRS += stupidmac
+DIRS =
+#DIRS += stupidmac
 
 all:
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;

@@ -30,7 +30,7 @@ void    rinfo_sendDone(OpenQueueEntry_t* msg,
 
 //=========================== public ==========================================
 
-void rinfo_init() {
+void rinfo_init(void) {
   
   
    if(idmanager_getIsDAGroot()==TRUE) return; 

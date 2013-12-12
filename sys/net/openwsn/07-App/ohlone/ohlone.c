@@ -13,23 +13,23 @@ ohlone_vars_t ohlone_vars;
 
 //=========================== prototypes ======================================
 
-void ohlone_sendpkt();
+void ohlone_sendpkt(void);
 bool ohlone_check4chars(uint8_t c1[4], uint8_t c2[4]);
 
 //=========================== public ==========================================
 
-void ohlone_init() {
+void ohlone_init(void) {
    ohlone_vars.httpChunk = 0;
    ohlone_vars.getRequest[0] = '/';
    ohlone_vars.getRequest[1] = ' ';
    ohlone_webpages_init();
 }
 
-bool ohlone_shouldIlisten() {
+bool ohlone_shouldIlisten(void) {
    return TRUE;
 }
 
-void ohlone_sendpkt() {
+void ohlone_sendpkt(void) {
    uint8_t buffer[TCP_DEFAULT_WINDOW_SIZE];
    uint8_t buffer_len;
   
@@ -106,7 +106,7 @@ void ohlone_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 void ohlone_connectDone(owerror_t error) {
 }
 
-bool ohlone_debugPrint() {
+bool ohlone_debugPrint(void) {
    return FALSE;
 }
 

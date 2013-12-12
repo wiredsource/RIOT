@@ -7,9 +7,11 @@
 #include "opentimers.h"
 #include "openrandom.h"
 #include "opencoap.h"
-#include "scheduler.h"
+//#include "scheduler.h"
 #include "idmanager.h"
 #include "IEEE802154E.h"
+
+#include "thread.h"
 
 //=========================== defines =========================================
 
@@ -23,7 +25,7 @@ typedef struct {
 } udprand_vars_t;
 
 udprand_vars_t udprand_vars;
-
+static char openwsn_udprand_stack[KERNEL_CONF_STACKSIZE_MAIN];
 //=========================== prototypes ======================================
 
 void udprand_timer(void);
@@ -73,7 +75,10 @@ void udprand_task(void){
 }
 
 void udprand_timer(void) {
-  scheduler_push_task(udprand_task,TASKPRIO_COAP);
+  //scheduler_push_task(udprand_task,TASKPRIO_COAP);
+  thread_create(openwsn_udprand_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                 PRIORITY_OPENWSN_UDPRAND, CREATE_STACKTEST, 
+                 udprand_task, "udprand task");
 }
 
 void udprand_sendDone(OpenQueueEntry_t* msg, owerror_t error) {

@@ -10,10 +10,10 @@
 
 //=========================== public ==========================================
 
-void tcpecho_init() {
+void tcpecho_init(void) {
 }
 
-bool tcpecho_shouldIlisten() {
+bool tcpecho_shouldIlisten(void) {
    return TRUE;
 }
 
@@ -46,7 +46,7 @@ void tcpecho_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 void tcpecho_connectDone(owerror_t error) {
 }
 
-bool tcpecho_debugPrint() {
+bool tcpecho_debugPrint(void) {
    return FALSE;
 }
 

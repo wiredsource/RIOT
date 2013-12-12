@@ -27,7 +27,7 @@ void    rwellknown_sendDone(OpenQueueEntry_t* msg,
 
 //=========================== public ==========================================
 
-void rwellknown_init() {
+void rwellknown_init(void) {
   
   
    if(idmanager_getIsDAGroot()==TRUE) return; 

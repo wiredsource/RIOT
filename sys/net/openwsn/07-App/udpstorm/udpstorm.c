@@ -6,10 +6,12 @@
 #include "packetfunctions.h"
 #include "openserial.h"
 #include "openrandom.h"
-#include "scheduler.h"
+//#include "scheduler.h"
 //#include "ADC_Channel.h"
 #include "IEEE802154E.h"
 #include "idmanager.h"
+
+#include "thread.h"
 
 //=========================== defines =========================================
 
@@ -19,11 +21,11 @@
 
 const uint8_t udpstorm_path0[] =  "strm";
 
-PRAGMA(pack(1));
+//PRAGMA(pack(1));
 typedef struct {
    uint16_t             seqNum;
 } udpstorm_payload_t;
-PRAGMA(pack());
+//PRAGMA(pack());
 
 //=========================== variables =======================================
 
@@ -34,14 +36,14 @@ typedef struct {
 } udpstorm_vars_t;
 
 udpstorm_vars_t udpstorm_vars;
-
+static char openwsn_udpstorm_stack[KERNEL_CONF_STACKSIZE_MAIN];
 //=========================== prototypes ======================================
 
 owerror_t udpstorm_receive(OpenQueueEntry_t* msg,
                          coap_header_iht*  coap_header,
                          coap_option_iht*  coap_options);
-void    udpstorm_timer_cb();
-void    udpstorm_task_cb();
+void    udpstorm_timer_cb(void);
+void    udpstorm_task_cb(void);
 void    udpstorm_sendDone(OpenQueueEntry_t* msg,
                           owerror_t           error);
 
@@ -74,8 +76,11 @@ owerror_t udpstorm_receive(OpenQueueEntry_t* msg,
 
 //timer fired, but we don't want to execute task in ISR mode
 //instead, push task to scheduler with CoAP priority, and let scheduler take care of it
-void udpstorm_timer_cb(){
-   scheduler_push_task(udpstorm_task_cb,TASKPRIO_COAP);
+void udpstorm_timer_cb(void){
+   //scheduler_push_task(udpstorm_task_cb,TASKPRIO_COAP);
+   thread_create(openwsn_udpstorm_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                  PRIORITY_OPENWSN_UDPSTORM, CREATE_STACKTEST, 
+                  udpstorm_task_cb, "udpstorm task cb");
 }
 
 void udpstorm_task_cb(void) {
@@ -127,8 +132,8 @@ void udpstorm_task_cb(void) {
    packetfunctions_reserveHeaderSize(pkt,sizeof(udpstorm_path0)-1);
    memcpy(&pkt->payload[0],&udpstorm_path0,sizeof(udpstorm_path0)-1);
    packetfunctions_reserveHeaderSize(pkt,1);
-   pkt->payload[0]                = (COAP_OPTION_NUM_URIPATH) << 4 |
-                                     sizeof(udpstorm_path0)-1;
+   pkt->payload[0]                = ((COAP_OPTION_NUM_URIPATH) << 4) |
+                                     (sizeof(udpstorm_path0)-1);
    numOptions++;
    // content-type option
    packetfunctions_reserveHeaderSize(pkt,2);

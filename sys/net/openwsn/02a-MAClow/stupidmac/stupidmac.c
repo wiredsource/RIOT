@@ -31,14 +31,14 @@ bool               stupidmac_serialInOutputMode;
 //=========================== prototypes ======================================
 
 #include "IEEE802154_common.c"
-void packetReceived();
-void armRandomBackoffTimer();
+void packetReceived(void);
+void armRandomBackoffTimer(void);
 void change_state(uint8_t newstate);
 
 //======= from upper layer
 
 //in stupidMAC, the radio is always on, listening
-void stupidmac_init() {
+void stupidmac_init(void) {
    radio_rxOn(openwsn_frequency_channel);
    change_state(S_IDLE_LISTENING);
    stupidmac_dataFrameToSend = NULL;
@@ -238,7 +238,7 @@ void radio_packet_received(OpenQueueEntry_t* msg) {
 
 //=========================== private =========================================
 
-void packetReceived() {
+void packetReceived(void) {
    if (stupidmac_dataFrameReceived->length>0) {
       //packet contains payload destined to an upper layer
       nores_receive(stupidmac_dataFrameReceived);
@@ -249,7 +249,7 @@ void packetReceived() {
    stupidmac_dataFrameReceived = NULL;
 }
 
-void armRandomBackoffTimer() {
+void armRandomBackoffTimer(void) {
    timer_startOneShot(TIMER_MAC_BACKOFF,MINBACKOFF); //TODO randomize
 }
 
@@ -271,14 +271,14 @@ void change_state(uint8_t newstate) {
    }
 }
 
-bool stupidmac_debugPrint() {
+bool stupidmac_debugPrint(void) {
    return FALSE;
 }
 
 //======= timers firing
 
 //periodic timer used to transmit, and to trigger serial input/output
-void timer_mac_periodic_fired() {
+void timer_mac_periodic_fired(void) {
 #ifndef SERIALINSCHEDULER
    openserial_stop();
 #endif
@@ -297,7 +297,7 @@ void timer_mac_periodic_fired() {
 
 //this function is the one which really initiates the transmission of a packet.
 //It only does so if the MAC layer is in S_IDLE_LISTENING stupidmac_state, otherwise it defers
-void timer_mac_backoff_fired() {
+void timer_mac_backoff_fired(void) {
    if (stupidmac_state==S_IDLE_LISTENING) {
       if (stupidmac_dataFrameToSend!=NULL) {
          openserial_printError(COMPONENT_MAC,ERR_DATAFRAMETOSEND_ERROR,
@@ -326,7 +326,7 @@ void timer_mac_backoff_fired() {
    }
 }
 
-void timer_mac_watchdog_fired() {
+void timer_mac_watchdog_fired(void) {
    switch (stupidmac_state) {
       case S_TX_RXACK:
          //I'm a transmitter, didn't receive ACK (end of TX sequence).

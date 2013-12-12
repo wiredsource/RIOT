@@ -7,7 +7,6 @@
 \addtogroup RES
 \{
 */
-
 #include "opentimers.h"
 
 //=========================== define ==========================================
@@ -28,7 +27,7 @@ typedef struct {
 //=========================== prototypes ======================================
 
 void    res_init(void);
-bool    debugPrint_myDAGrank(void);
+uint8_t    debugPrint_myDAGrank(void); // TODO: was bool but complained "conflicting types"
 // from upper layer
 owerror_t res_send(OpenQueueEntry_t *msg);
 // from lower layer

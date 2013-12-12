@@ -672,7 +672,7 @@ ipv6_header_iht retrieveIPv6Header(OpenQueueEntry_t* msg) {
       if    ( (temp_8b & NHC_UDP_MASK) == NHC_UDP_ID) {
          ipv6_header.next_header = IANA_UDP;
       }else if ( (temp_8b & NHC_IPv6EXT_MASK) == NHC_IPv6EXT_ID){
-        if( temp_8b & NHC_IPv6HOP_MASK == NHC_IPv6HOP_VAL){
+        if( (temp_8b & NHC_IPv6HOP_MASK) == NHC_IPv6HOP_VAL){
           //it is hop by hop header
           ipv6_header.next_header = IANA_IPv6HOPOPT;
         }else{

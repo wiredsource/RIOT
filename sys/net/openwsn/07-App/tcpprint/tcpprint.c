@@ -10,10 +10,10 @@
 
 //=========================== public ==========================================
 
-void tcpprint_init() {
+void tcpprint_init(void) {
 }
 
-bool tcpprint_shouldIlisten(){
+bool tcpprint_shouldIlisten(void){
    return TRUE;
 }
 
@@ -30,7 +30,7 @@ void tcpprint_connectDone(owerror_t error) {
 void tcpprint_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
 }
 
-bool tcpprint_debugPrint() {
+bool tcpprint_debugPrint(void) {
    return FALSE;
 }
 
