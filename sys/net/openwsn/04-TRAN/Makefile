@@ -25,7 +25,6 @@ INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/cross-layers
 .PHONY: $(BINDIR)$(SUBMOD)
 
 $(BINDIR)$(SUBMOD): $(OBJ)
-	echo $(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 
 # pull in dependency info for *existing* .o files

@@ -33,7 +33,6 @@ all: $(BINDIR)$(SUBMOD)
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 $(BINDIR)$(SUBMOD): $(OBJ)
-	echo $(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 
 # pull in dependency info for *existing* .o files
