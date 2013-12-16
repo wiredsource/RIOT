@@ -32,7 +32,7 @@
 #include "openudp.h"
 #include "opencoap.h"
 //-- app (common)
-#include "rreg.h"
+//#include "rreg.h"
 #include "rwellknown.h"
 #include "rinfo.h"
 //===== applications
@@ -49,14 +49,14 @@
 //#include "udplatency.h"
 //#include "udpstorm.h"
 //-- CoAP
-#include "rleds.h"
+//#include "rleds.h"
 //#include "rt.h"
 //#include "rex.h"
 //#include "rheli.h"
 //#include "rrube.h"
 //#include "rxl1.h"
 //#include "layerdebug.h"
-#include "r6tus.h"
+//#include "r6tus.h"
 //-- misc
 //#include "heli.h"
 //#include "imu.h"

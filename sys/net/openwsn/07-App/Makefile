@@ -1,4 +1,9 @@
-MODULE:=$(shell basename $(CURDIR))
+SUBMOD:=$(shell basename $(CURDIR)).a
+BINDIR = $(RIOTBASE)/bin/
+SRC = $(wildcard *.c)
+OBJ = $(SRC:%.c=$(BINDIR)%.o)
+DEP = $(SRC:%.c=$(BINDIR)%.d)
+
 INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/drivers/cc110x_ng/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/sys/net/include/ 
 INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/02a-MAClow
 INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/02b-MAChigh
@@ -24,11 +29,22 @@ DIRS += udpprint
 DIRS += udprand
 DIRS += udpstorm
 
-all:
+all: $(BINDIR)$(SUBMOD)
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-include $(RIOTBASE)/Makefile.base
+$(BINDIR)$(SUBMOD): $(OBJ)
+	echo $(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
+	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 
-# remove compilation products
+# pull in dependency info for *existing* .o files
+-include $(OBJ:.o=.d)
+
+# compile and generate dependency info
+$(BINDIR)%.o: %.c
+	mkdir -p $(BINDIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
+	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
+	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
+
 clean::
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
