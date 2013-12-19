@@ -28,6 +28,9 @@
 
 #define MAXTHREADS 32
 
+#define SCHEDSTATISTICS (1)
+#define SCHED_TEST_STACK 
+
 #if ARCH_32_BIT
 #define SCHED_PRIO_LEVELS 32
 #else

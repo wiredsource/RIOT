@@ -5,6 +5,9 @@
 */
 
 #include "openwsn.h"
+#include "scheduler.h"
+#include "thread.h"
+#include "board.h"
 //===== drivers
 #include "openserial.h"
 //===== stack
@@ -63,15 +66,34 @@
 
 //=========================== variables =======================================
 
+static char openwsn_stack[KERNEL_CONF_STACKSIZE_MAIN];
+
 //=========================== prototypes ======================================
 
-void openwsn_init();
+void openwsn_init(void);
+void openwsn_start(void);
 
 //=========================== public ==========================================
+
+void openwsn_start_thread(void) {
+    puts(__PRETTY_FUNCTION__);
+    thread_create(openwsn_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+                   PRIORITY_OPENWSN, CREATE_STACKTEST, 
+                   openwsn_start, "openwsn thread");
+}
+
+void openwsn_start(void) {
+    puts(__PRETTY_FUNCTION__);
+    //board_init();
+    scheduler_init();
+    openwsn_init();
+    scheduler_start();
+}
 
 //=========================== private =========================================
 
 void openwsn_init(void) {
+    puts(__PRETTY_FUNCTION__);
    //===== drivers
    openserial_init();
    

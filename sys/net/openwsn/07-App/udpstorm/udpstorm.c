@@ -6,7 +6,7 @@
 #include "packetfunctions.h"
 #include "openserial.h"
 #include "openrandom.h"
-//#include "scheduler.h"
+#include "scheduler.h"
 //#include "ADC_Channel.h"
 #include "IEEE802154E.h"
 #include "idmanager.h"
@@ -36,7 +36,7 @@ typedef struct {
 } udpstorm_vars_t;
 
 udpstorm_vars_t udpstorm_vars;
-static char openwsn_udpstorm_stack[KERNEL_CONF_STACKSIZE_MAIN];
+//static char openwsn_udpstorm_stack[KERNEL_CONF_STACKSIZE_MAIN];
 //=========================== prototypes ======================================
 
 owerror_t udpstorm_receive(OpenQueueEntry_t* msg,
@@ -77,10 +77,10 @@ owerror_t udpstorm_receive(OpenQueueEntry_t* msg,
 //timer fired, but we don't want to execute task in ISR mode
 //instead, push task to scheduler with CoAP priority, and let scheduler take care of it
 void udpstorm_timer_cb(void){
-   //scheduler_push_task(udpstorm_task_cb,TASKPRIO_COAP);
-   thread_create(openwsn_udpstorm_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+    scheduler_push_task(udpstorm_task_cb,TASKPRIO_COAP);
+   /*thread_create(openwsn_udpstorm_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                   PRIORITY_OPENWSN_UDPSTORM, CREATE_STACKTEST, 
-                  udpstorm_task_cb, "udpstorm task cb");
+                  udpstorm_task_cb, "udpstorm task cb");*/
 }
 
 void udpstorm_task_cb(void) {

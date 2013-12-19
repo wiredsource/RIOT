@@ -11,7 +11,7 @@
 #include "openudp.h"
 #include "opentcp.h"
 //#include "debugpins.h"
-//#include "scheduler.h"
+#include "scheduler.h"
 
 //=========================== variables =======================================
 

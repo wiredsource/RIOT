@@ -7,7 +7,7 @@
 #include "iphc.h"
 #include "packetfunctions.h"
 #include "openrandom.h"
-//#include "scheduler.h"
+#include "scheduler.h"
 #include "opentimers.h"
 //#include "debugpins.h"
 
@@ -17,7 +17,7 @@
 //=========================== variables =======================================
 
 res_vars_t res_vars;
-static char openwsn_res_stack[KERNEL_CONF_STACKSIZE_MAIN];
+//static char openwsn_res_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototypes ======================================
 
@@ -455,8 +455,8 @@ port_INLINE void sendKa(void) {
 }
 
 void res_timer_cb(void) {
-   // scheduler_push_task(timers_res_fired,TASKPRIO_RES);
-   thread_create(openwsn_res_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+   scheduler_push_task(timers_res_fired,TASKPRIO_RES);
+   /*thread_create(openwsn_res_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                  PRIORITY_OPENWSN_RES, CREATE_STACKTEST, 
-                 timers_res_fired, "timers res fired");
+                 timers_res_fired, "timers res fired");*/
 }

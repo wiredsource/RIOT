@@ -26,7 +26,7 @@ typedef struct {
    uint8_t         busy;
 #ifdef SPI_IN_INTERRUPT_MODE
    // callback when module done
-   spi_cbt         callback;
+   spi_cbt         spi_cb;
 #endif
 } spi_vars_t;
 
@@ -134,7 +134,7 @@ void spi_txrx(uint8_t*     bufTx,
    if (spi_vars.isFirst==SPI_FIRST) {
       P4OUT                 &= ~0x04;
    }
-   
+
 #ifdef SPI_IN_INTERRUPT_MODE
    // implementation 1. use a callback function when transaction finishes
    
@@ -145,13 +145,18 @@ void spi_txrx(uint8_t*     bufTx,
    __enable_interrupt();
 #else
    // implementation 2. busy wait for each byte to be sent
-   
+
    // send all bytes
    while (spi_vars.txBytesLeft>0) {
       // write next byte to TX buffer
       U0TXBUF                = *spi_vars.pNextTxByte;
       // busy wait on the interrupt flag
-      while ((IFG1 & URXIFG0)==0);
+      uint32_t c = 0;
+      while ((IFG1 & URXIFG0)==0) 
+          if (c++ == 1000) {
+              puts("spi_txrx timeout"); 
+              break;
+          }
       // clear the interrupt flag
       IFG1                  &= ~URXIFG0;
       // save the byte just received in the RX buffer
@@ -174,7 +179,7 @@ void spi_txrx(uint8_t*     bufTx,
       spi_vars.numTxedBytes++;
       spi_vars.txBytesLeft--;
    }
-   
+
    // put CS signal high to signal end of transmission to slave
    if (spi_vars.isLast==SPI_LAST) {
       P4OUT                 |=  0x04;
@@ -224,7 +229,7 @@ kick_scheduler_t spi_isr(void) {
       spi_vars.busy             =  0;
       
       // SPI is done!
-      if (spi_vars.callback!=NULL) {
+      if (spi_vars.spi_cb!=NULL) {
          // call the callback
          spi_vars.spi_cb();
          // kick the OS

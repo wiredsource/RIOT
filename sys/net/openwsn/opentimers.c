@@ -45,7 +45,7 @@ void opentimers_init(void){
    }
 
    // set callback for bsp_timers module
-   bsp_timer_set_callback(opentimers_timer_callback);
+   //bsp_timer_set_callback(opentimers_timer_callback);
 }
 
 /**

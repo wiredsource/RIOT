@@ -14,17 +14,12 @@
 
 #include <stdbool.h>
 #include "kernel.h"
+//========================= prototypes ========================================
+void openwsn_start_thread(void);
 
 //=========================== define ==========================================
 
-#define PRIORITY_OPENWSN_RES        PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_ICMPV6RPL  PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_COAP       PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_OPENTCP    PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_UDPLATENCY PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_UDPRAND    PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_UDPSTORM   PRIORITY_MAIN-1
-#define PRIORITY_OPENWSN_IEEE802154E PRIORITY_MAIN-1
+#define PRIORITY_OPENWSN            PRIORITY_MAIN-1
 
 static const uint8_t infoStackName[] = "OpenWSN ";
 #define OPENWSN_VERSION_MAJOR     1

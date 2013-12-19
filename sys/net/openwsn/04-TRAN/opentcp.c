@@ -5,7 +5,7 @@
 #include "forwarding.h"
 #include "packetfunctions.h"
 //#include "bsp_timer.h"
-//#include "scheduler.h"
+#include "scheduler.h"
 #include "opentimers.h"
 //TCP applications
 #include "ohlone.h"
@@ -18,7 +18,7 @@
 //=========================== variables =======================================
 
 tcp_vars_t tcp_vars;
-static char openwsn_opentcp_stack[KERNEL_CONF_STACKSIZE_MAIN];
+//static char openwsn_opentcp_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototypes ======================================
 
@@ -746,8 +746,8 @@ void tcp_change_state(uint8_t new_tcp_state) {
 }
 
 void opentcp_timer_cb(void) {
-   //scheduler_push_task(timers_tcp_fired,TASKPRIO_TCP_TIMEOUT);
-   thread_create(openwsn_opentcp_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+    scheduler_push_task(timers_tcp_fired,TASKPRIO_TCP_TIMEOUT);
+   /*thread_create(openwsn_opentcp_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                   PRIORITY_OPENWSN_OPENTCP, CREATE_STACKTEST, 
-                  timers_tcp_fired, "timers tcp fired");
+                  timers_tcp_fired, "timers tcp fired");*/
 }

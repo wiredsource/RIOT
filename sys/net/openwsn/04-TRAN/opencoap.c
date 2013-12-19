@@ -7,14 +7,14 @@
 #include "packetfunctions.h"
 #include "idmanager.h"
 #include "opentimers.h"
-//#include "scheduler.h"
+#include "scheduler.h"
 
 #include "thread.h"
 
 //=========================== variables =======================================
 
 opencoap_vars_t opencoap_vars;
-static char openwsn_coap_stack[KERNEL_CONF_STACKSIZE_MAIN];
+//static char openwsn_coap_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototype =======================================
 
@@ -357,8 +357,8 @@ owerror_t opencoap_send(OpenQueueEntry_t*     msg,
 //=========================== private =========================================
 
 void icmpv6coap_timer_cb(void) {
-   //scheduler_push_task(timers_coap_fired,TASKPRIO_COAP);
-   thread_create(openwsn_coap_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+    scheduler_push_task(timers_coap_fired,TASKPRIO_COAP);
+   /*thread_create(openwsn_coap_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                   PRIORITY_OPENWSN_COAP, CREATE_STACKTEST, 
-                  timers_coap_fired, "timers coap fired");
+                  timers_coap_fired, "timers coap fired");*/
 }

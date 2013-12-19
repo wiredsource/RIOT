@@ -8,7 +8,7 @@
 #include "openserial.h"
 #include "schedule.h"
 #include "packetfunctions.h"
-//#include "scheduler.h"
+#include "scheduler.h"
 #include "leds.h"
 #include "neighbors.h"
 #include "debugpins.h"
@@ -22,8 +22,8 @@ ieee154e_vars_t    ieee154e_vars;
 ieee154e_stats_t   ieee154e_stats;
 ieee154e_dbg_t     ieee154e_dbg;
 
-static char openwsn_ieee802154e_rec_stack[KERNEL_CONF_STACKSIZE_MAIN];
-static char openwsn_ieee802154e_send_stack[KERNEL_CONF_STACKSIZE_MAIN];
+//static char openwsn_ieee802154e_rec_stack[KERNEL_CONF_STACKSIZE_MAIN];
+//static char openwsn_ieee802154e_send_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 //=========================== prototypes ======================================
 void isr_ieee154e_newSlot(void);
@@ -101,7 +101,7 @@ Call this function once before any other function in this module, possibly
 during boot-up.
 */
 void ieee154e_init(void) {
-   
+    puts(__PRETTY_FUNCTION__);
    // initialize variables
    memset(&ieee154e_vars,0,sizeof(ieee154e_vars_t));
    memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
@@ -1845,10 +1845,10 @@ void notif_sendDone(OpenQueueEntry_t* packetSent, owerror_t error) {
    // COMPONENT_IEEE802154E_TO_RES so RES can knows it's for it
    packetSent->owner              = COMPONENT_IEEE802154E_TO_RES;
    // post RES's sendDone task
-   //scheduler_push_task(task_resNotifSendDone,TASKPRIO_RESNOTIF_TXDONE);
-   thread_create(openwsn_ieee802154e_send_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+   scheduler_push_task(task_resNotifSendDone,TASKPRIO_RESNOTIF_TXDONE);
+   /*thread_create(openwsn_ieee802154e_send_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                   PRIORITY_OPENWSN_IEEE802154E, CREATE_STACKTEST, 
-                  task_resNotifSendDone, "task resNotifSendDone");
+                  task_resNotifSendDone, "task resNotifSendDone");*/
    // wake up the scheduler
    SCHEDULER_WAKEUP();
 }
@@ -1863,10 +1863,10 @@ void notif_receive(OpenQueueEntry_t* packetReceived) {
    packetReceived->owner          = COMPONENT_IEEE802154E_TO_RES;
 
    // post RES's Receive task
-   //scheduler_push_task(task_resNotifReceive,TASKPRIO_RESNOTIF_RX);
-   thread_create(openwsn_ieee802154e_rec_stack, KERNEL_CONF_STACKSIZE_MAIN, 
+   scheduler_push_task(task_resNotifReceive,TASKPRIO_RESNOTIF_RX);
+   /*thread_create(openwsn_ieee802154e_rec_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                   PRIORITY_OPENWSN_IEEE802154E, CREATE_STACKTEST, 
-                  task_resNotifSendDone, "task resNotifSendDone");
+                  task_resNotifSendDone, "task resNotifSendDone");*/
    // wake up the scheduler
    SCHEDULER_WAKEUP();
 }
