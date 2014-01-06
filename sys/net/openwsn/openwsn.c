@@ -7,7 +7,7 @@
 #include "openwsn.h"
 #include "scheduler.h"
 #include "thread.h"
-#include "board.h"
+#include "board_ow.h"
 //===== drivers
 #include "openserial.h"
 //===== stack
@@ -84,7 +84,7 @@ void openwsn_start_thread(void) {
 
 void openwsn_start(void) {
     puts(__PRETTY_FUNCTION__);
-    //board_init();
+    board_init_ow();
     scheduler_init();
     openwsn_init();
     scheduler_start();

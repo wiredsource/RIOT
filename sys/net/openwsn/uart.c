@@ -6,7 +6,7 @@
 
 #include "msp430f1611.h"
 #include "uart.h"
-#include "board.h"
+#include "board_ow.h"
 
 //=========================== defines =========================================
 
