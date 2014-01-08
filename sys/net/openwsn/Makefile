@@ -4,7 +4,7 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/drivers/cc110x_ng/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/sys/net/include/
+INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/drivers/cc110x_ng/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/cpu/msp430-common/include -I$(RIOTBASE)/sys/net/include/
 
 INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/02a-MAClow
 INCLUDES += -I$(RIOTBASE)/sys/net/openwsn/02b-MAChigh
