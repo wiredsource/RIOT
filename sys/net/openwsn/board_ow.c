@@ -9,6 +9,7 @@
 #include "radiotimer.h"
 
 void board_init_ow() {
+   puts(__PRETTY_FUNCTION__);
    //disable watchdog timer
    WDTCTL     =  WDTPW + WDTHOLD;
    
@@ -41,3 +42,24 @@ void board_reset() {
 void board_sleep() {
    __bis_SR_register(GIE+LPM0_bits);             // sleep, but leave ACLK on
 }
+ISR(COMPARATORA) {
+   //debugpins_isr_set();
+   __bic_SR_register_on_exit(CPUOFF);            // restart CPU
+   //debugpins_isr_clr();
+}
+
+ISR(TIMERB1) {
+   //debugpins_isr_set();
+   if (radiotimer_isr()==KICK_SCHEDULER) {       // radiotimer
+      __bic_SR_register_on_exit(CPUOFF);
+   }
+   //debugpins_isr_clr();
+}
+
+// ISR(TIMERA0) {
+//    //debugpins_isr_set();
+//    if (bsp_timer_isr()==KICK_SCHEDULER) {        // timer: 0
+//       __bic_SR_register_on_exit(CPUOFF);
+//    }
+//    //debugpins_isr_clr();
+// }
