@@ -22,20 +22,19 @@ void consumeTask(uint8_t taskId);
 //=========================== public ==========================================
 
 void scheduler_init() {   
-   puts(__PRETTY_FUNCTION__);
    // initialization module variables
    memset(&scheduler_vars,0,sizeof(scheduler_vars_t));
    memset(&scheduler_dbg,0,sizeof(scheduler_dbg_t));
    
    // enable the scheduler's interrupt so SW can wake up the scheduler
    //SCHEDULER_ENABLE_INTERRUPT();
+   puts(__PRETTY_FUNCTION__);
 }
 
 void scheduler_start() {
     puts(__PRETTY_FUNCTION__);
    taskList_item_t* pThisTask;
    while (1) {
-       puts("while forever");
       while(scheduler_vars.task_list!=NULL) {
           puts("hey, a task!");
          // there is still at least one task in the linked-list of tasks
@@ -57,11 +56,11 @@ void scheduler_start() {
       }
       puts("scheduler: nothing to do");
       //debugpins_task_clr();
-      //puts("go to sleep");
-      //board_sleep();
-      //puts("awake again");
+      puts("go to sleep");
+      board_sleep();
+      puts("awake again");
       //debugpins_task_set();                      // IAR should halt here if nothing to do
-      while (1) puts("why so sad?");
+      //while (1) puts("why so sad?");
    }
    puts("leaving... WTF?!");
 }
