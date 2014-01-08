@@ -84,7 +84,7 @@ void openwsn_start_thread(void) {
 
 void openwsn_start(void) {
     puts(__PRETTY_FUNCTION__);
-    board_init_ow();
+    //board_init_ow();
     scheduler_init();
     openwsn_init();
     scheduler_start();
