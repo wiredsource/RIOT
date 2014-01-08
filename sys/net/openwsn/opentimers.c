@@ -9,8 +9,11 @@ at most MAX_NUM_TIMERS timers.
 
 #include "openwsn.h"
 #include "opentimers.h"
-#include "bsp_timer.h"
+//#include "bsp_timer.h"
 #include "leds.h"
+
+#include "hwtimer_arch.h"
+#include "hwtimer_cpu.h"
 
 //=========================== define ==========================================
 
@@ -21,6 +24,7 @@ opentimers_vars_t opentimers_vars;
 
 //=========================== prototypes ======================================
 
+void opentimers_int_handler(int);
 void opentimers_timer_callback(void);
 
 //=========================== public ==========================================
@@ -45,7 +49,18 @@ void opentimers_init(void){
    }
 
    // set callback for bsp_timers module
-   bsp_timer_set_callback(opentimers_timer_callback);
+   // bsp_timer_set_callback(opentimers_timer_callback);
+   hwtimer_arch_init(opentimers_int_handler, F_CPU); 
+}
+
+/** 
+\brief opentimers interrupt handler
+
+This is a wrapper to fit the hwtimer_arch API
+ */
+void opentimers_int_handler(int t) {
+    (void)t; 
+    opentimers_timer_callback();
 }
 
 /**
@@ -121,9 +136,11 @@ opentimer_id_t opentimers_start(uint32_t duration, timer_type_t type, time_type_
       ) {  
          opentimers_vars.currentTimeout            = opentimers_vars.timersBuf[id].ticks_remaining;
          if (opentimers_vars.running==FALSE) {
-            bsp_timer_reset();
+            //bsp_timer_reset();
+            hwtimer_arch_unset(OPENTIMERS_HWTIMER_ID); 
          }
-         bsp_timer_scheduleIn(opentimers_vars.timersBuf[id].ticks_remaining);
+         // bsp_timer_scheduleIn(opentimers_vars.timersBuf[id].ticks_remaining);
+         hwtimer_arch_set(opentimers_vars.timersBuf[id].ticks_remaining, OPENTIMERS_HWTIMER_ID);
       }
 
       opentimers_vars.running                         = TRUE;
@@ -274,7 +291,8 @@ void opentimers_timer_callback(void) {
    if (found==TRUE) {
       // at least one timer pending
       opentimers_vars.currentTimeout = min_timeout;
-      bsp_timer_scheduleIn(opentimers_vars.currentTimeout);
+      // bsp_timer_scheduleIn(opentimers_vars.currentTimeout);
+      hwtimer_arch_set(opentimers_vars.currentTimeout, OPENTIMERS_HWTIMER_ID);
    } else {
       // no more timers pending
       opentimers_vars.running = FALSE;
@@ -355,7 +373,8 @@ void opentimers_sleepTimeCompesation(uint16_t sleepTime)
    if (found==TRUE) {
       // at least one timer pending
       opentimers_vars.currentTimeout = min_timeout;
-      bsp_timer_scheduleIn(opentimers_vars.currentTimeout);
+      // bsp_timer_scheduleIn(opentimers_vars.currentTimeout);
+      hwtimer_arch_set(opentimers_vars.currentTimeout, OPENTIMERS_HWTIMER_ID);
    } else {
       // no more timers pending
       opentimers_vars.running = FALSE;

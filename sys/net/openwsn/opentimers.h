@@ -9,6 +9,8 @@
 
 #include "openwsn.h"
 
+#include "hwtimer_cpu.h"
+
 /**
 \addtogroup drivers
 \{
@@ -28,6 +30,8 @@
 #define opentimer_id_t uint8_t
 
 typedef void (*opentimers_cbt)(void);
+
+#define OPENTIMERS_HWTIMER_ID (ARCH_MAXTIMERS - 1)
 
 //=========================== typedef =========================================
 
