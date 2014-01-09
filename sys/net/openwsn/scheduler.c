@@ -36,12 +36,11 @@ void scheduler_start() {
    taskList_item_t* pThisTask;
    while (1) {
       while(scheduler_vars.task_list!=NULL) {
-          puts("hey, a task!");
          // there is still at least one task in the linked-list of tasks
          
          // the task to execute is the one at the head of the queue
          pThisTask                = scheduler_vars.task_list;
-         printf("run task %p with prio %d", pThisTask->cb, pThisTask->prio);
+         printf("run task %p with prio %d\n", pThisTask->cb, pThisTask->prio);
          // shift the queue by one task
          scheduler_vars.task_list = pThisTask->next;
          
@@ -54,13 +53,9 @@ void scheduler_start() {
          pThisTask->next          = NULL;
          scheduler_dbg.numTasksCur--;
       }
-      puts("scheduler: nothing to do");
       //debugpins_task_clr();
-      puts("go to sleep");
       board_sleep();
-      puts("awake again");
       //debugpins_task_set();                      // IAR should halt here if nothing to do
-      //while (1) puts("why so sad?");
    }
    puts("leaving... WTF?!");
 }

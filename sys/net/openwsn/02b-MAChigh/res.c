@@ -455,6 +455,7 @@ port_INLINE void sendKa(void) {
 }
 
 void res_timer_cb(void) {
+   puts(__PRETTY_FUNCTION__);
    scheduler_push_task(timers_res_fired,TASKPRIO_RES);
    /*thread_create(openwsn_res_stack, KERNEL_CONF_STACKSIZE_MAIN, 
                  PRIORITY_OPENWSN_RES, CREATE_STACKTEST, 

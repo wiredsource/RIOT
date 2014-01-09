@@ -42,11 +42,11 @@ void board_reset() {
 void board_sleep() {
    __bis_SR_register(GIE+LPM0_bits);             // sleep, but leave ACLK on
 }
-ISR(COMPARATORA) {
-   //debugpins_isr_set();
-   __bic_SR_register_on_exit(CPUOFF);            // restart CPU
-   //debugpins_isr_clr();
-}
+// ISR(COMPARATORA) {
+//    //debugpins_isr_set();
+//    __bic_SR_register_on_exit(CPUOFF);            // restart CPU
+//    //debugpins_isr_clr();
+// }
 
 ISR(TIMERB1) {
    //debugpins_isr_set();
