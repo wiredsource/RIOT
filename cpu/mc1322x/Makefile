@@ -1,11 +1,12 @@
 MODULE =cpu
 
 DIRS = $(RIOTCPU)/arm_common
+DIRS += maca
 ifneq (,$(findstring mc1322x_adc,$(USEMODULE)))
   DIRS += adc
 endif
 ifneq (,$(findstring mc1322x_asm,$(USEMODULE)))
-	DIRS += asm
+  DIRS += asm
 endif
 
 all: $(BINDIR)$(MODULE).a
