@@ -105,6 +105,9 @@ endif
 ifneq (,$(findstring quad_math,$(USEMODULE)))
     DIRS += quad_math
 endif
+ifneq (,$(findstring openwsn,$(USEMODULE)))
+	DIRS += net/openwsn
+endif
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;

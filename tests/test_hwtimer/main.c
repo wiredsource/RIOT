@@ -27,6 +27,11 @@
 #define MSGLEN 12 // == strlen("callback %2i")
 char msg[MSGLEN * ARCH_MAXTIMERS]; // == [callback  1\0callback  2\0...]
 
+void rtc_handler(void) {}
+void rtcalarm_handler(void) {}
+void spi1_handler(void) {}
+void exti4_handler(void) {}
+
 void callback(void *ptr)
 {
     puts((char *) ptr);
