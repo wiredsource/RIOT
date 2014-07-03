@@ -1,10 +1,22 @@
+/*
+ * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 /**
-  * at86rf231.c - Implementation of at86rf231 functions.
-  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
-  *
-  * This source code is licensed under the GNU Lesser General Public License,
-  * Version 2.  See the file LICENSE for more details.
-  */
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file        at86rf231.c
+ * @brief       Driver implementation for at86rf231 chip
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ *
+ * @}
+ */
 
 #include "at86rf231.h"
 #include "at86rf231_arch.h"
@@ -78,7 +90,7 @@ void at86rf231_switch_to_rx(void)
         vtimer_usleep(10);
 
         if (!--max_wait) {
-            printf("at86rf231 : ERROR : could not enter RX_ON mode");
+            printf("at86rf231 : ERROR : could not enter RX_ON mode\n");
             break;
         }
     }
