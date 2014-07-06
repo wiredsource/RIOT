@@ -104,7 +104,7 @@ struct ccnl_relay_s {
     void *aux;
     int fib_threshold_prefix; /* how may name components should be considdered as dynamic */
     int fib_threshold_aggregate;
-    int riot_pid;
+    kernel_pid_t riot_pid;
     int riot_helper_pid;
     mutex_t global_lock;
     mutex_t stop_lock;
