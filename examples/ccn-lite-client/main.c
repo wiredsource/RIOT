@@ -183,7 +183,7 @@ static void riot_ccn_relay_start(void)
             relay_stack, sizeof(relay_stack),
             PRIORITY_MAIN - 2, CREATE_STACKTEST,
             ccnl_riot_relay_start, NULL, "relay");
-    DEBUG("ccn-lite relay on thread_id %d...\n", relay_pid);
+    DEBUG("ccn-lite relay on thread_id %" PRIkernel_pid "...\n", relay_pid);
 
     riot_ccn_transceiver_start(relay_pid);
 }
