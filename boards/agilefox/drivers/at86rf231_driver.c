@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     board_agilefox
  * @{
  *
  * @file        at86rf231_driver.c
@@ -33,17 +33,17 @@
 #include "at86rf231_spi.h"
 
 /*
-SPI1
-  SCLK : PA5
-  MISO : PA6
-  MOSI : PA7
-  CS : PA4
+SPI2
+  SCLK : PB13
+  MISO : PB14
+  MOSI : PB15
+  CS : PA1
 
 GPIO
-  IRQ0 : PC4 : Frame buff empty indicator
-  DIG2 : ? : RX Frame Time stamping XXX : NOT USED
+  IRQ0 : PC2 : Frame buff empty indicator
+  DIG2 : TIM3_CH4 : RX Frame Time stamping TODO : NOT USED, TIM3 is used as general timer.
   Reset : PC1 : active low, enable chip
-  SLEEP : PA2 : control sleep, tx & rx state
+  SLEEP : PA0 : control sleep, tx & rx state
 */
 
 static inline void RESET_CLR(void)
@@ -88,10 +88,10 @@ void at86rf231_gpio_spi_interrupts_init(void)
 {
     /* set up GPIO pins */
     /* SCLK and MOSI*/
-    GPIOA->CRL &= ~(0xf << (5 * 4));
-    GPIOA->CRL |= (0xb << (5 * 4));
-    GPIOA->CRL &= ~(0xf << (7 * 4));
-    GPIOA->CRL |= (0xb << (7 * 4));
+    GPIOB->CRH &= ~(0xf << ((13-8) * 4));
+    GPIOB->CRH |= (0xb << ((13-8) * 4));
+    GPIOB->CRH &= ~(0xf << ((15-8) * 4));
+    GPIOB->CRH |= (0xb << ((15-8) * 4));
     /* MISO */
     gpio_init_in(SPI_0_MISO_GPIO, GPIO_NOPULL);
 
@@ -104,7 +104,7 @@ void at86rf231_gpio_spi_interrupts_init(void)
     gpio_init_in(SPI_0_IRQ0_GPIO, GPIO_NOPULL);
     gpio_init_int(SPI_0_IRQ0_GPIO, GPIO_NOPULL, GPIO_RISING, at86rf231_rx_irq);
 
-    /* Connect EXTI4 Line to PC4 pin */
+    /* Connect EXTI2 Line to PC2 pin */
     enable_exti_interrupt();
 
     /* CS */

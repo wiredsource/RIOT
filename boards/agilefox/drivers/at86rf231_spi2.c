@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     board_agilefox
  * @{
  *
- * @file        at86rf231_spi1.c
+ * @file        at86rf231_spi2.c
  * @brief       Board specific implementations for the at86rf231 SPI interface
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -21,19 +21,20 @@
 
 #include "cpu.h"
 #include "spi.h"
+#include "periph_conf.h"
 
 /*
-SPI1
-  SCLK : PA5
-  MISO : PA6
-  MOSI : PA7
-  CS : PA4
+SPI2
+  SCLK : PB13
+  MISO : PB14
+  MOSI : PB15
+  CS : PA1
 
 GPIO
-  IRQ0 : PC4 : Frame buff empty indicator
-  DIG2 : ? : RX Frame Time stamping XXX : NOT USED
+  IRQ0 : PC2 : Frame buff empty indicator
+  DIG2 : TIM3_CH4 : RX Frame Time stamping TODO : NOT USED, TIM3 is used as general timer.
   Reset : PC1 : active low, enable chip
-  SLEEP : PA2 : control sleep, tx & rx state
+  SLEEP : PA0 : control sleep, tx & rx state
 */
 
 uint8_t at86rf231_spi_transfer_byte(uint8_t byte)
