@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "kernel_types.h"
 #include "radio/types.h"
 
 #include "ieee802154_frame.h"
