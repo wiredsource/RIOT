@@ -48,16 +48,16 @@ typedef void (* receive_802154_packet_callback_t)(void *buf,
  */
 typedef enum {
     /** Beacon packet */
-    PACKET_KIND_BEACON,
+    PACKET_KIND_BEACON = 0x00,
 
     /** Standard data packet */
-    PACKET_KIND_DATA,
+    PACKET_KIND_DATA = 0x01,
 
     /** Acknowledgement packet */
-    PACKET_KIND_ACK,
+    PACKET_KIND_ACK = 0x02,
 
     /** MAC command */
-    PACKET_KIND_MAC_CMD,
+    PACKET_KIND_MAC_CMD = 0x03,
 
     /** invalid packet kind */
     PACKET_KIND_INVALID = -1
