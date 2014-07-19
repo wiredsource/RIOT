@@ -6,6 +6,7 @@
 
 #include "kernel_types.h"
 #include "radio/types.h"
+#include "radio_driver.h"
 
 #include "ieee802154_frame.h"
 
@@ -13,6 +14,11 @@
 
 #define AT86RF231_MAX_PKT_LENGTH 127
 #define AT86RF231_MAX_DATA_LENGTH 118
+
+#define S(x) #x
+#define S_(x) S(x)
+#define S__LINE__ S_(__LINE__)
+#define NOT_IMPL puts(__FILE__ ":" S__LINE__ " not_implemented")
 
 /**
  *  Structure to represent a at86rf231 packet.
@@ -62,5 +68,56 @@ enum {
 };
 
 extern at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
+
+radio_tx_status_t at86rf231_load_tx_buf(ieee802154_packet_kind_t kind,
+                                        ieee802154_node_addr_t dest,
+                                        bool use_long_addr,
+                                        bool wants_ack,
+                                        void *buf,
+                                        unsigned int len);
+
+radio_tx_status_t at86rf231_transmit_tx_buf(void);
+
+radio_tx_status_t at86rf231_do_send(ieee802154_packet_kind_t kind,
+                                    ieee802154_node_addr_t dest,
+                                    bool use_long_addr,
+                                    bool wants_ack,
+                                    void *buf,
+                                    unsigned int len);
+
+void at86rf231_set_recv_callback(receive_802154_packet_callback_t recv_cb);
+
+/* setter functions wrappers, to maintain compatibility with both
+   ieee802154_radio_driver_t and transceiver module */
+
+static inline void do_set_channel(unsigned int chan) {
+    at86rf231_set_channel(chan);
+}
+
+static inline unsigned do_get_channel(void) {
+    return (unsigned) at86rf231_get_channel();
+}
+
+static inline void do_set_monitor(bool b)
+{
+    at86rf231_set_monitor((uint8_t) b);
+}
+
+static inline void do_set_address(uint16_t addr) {
+    at86rf231_set_address(addr);
+}
+
+static inline void do_set_long_address(uint64_t addr) {
+    at86rf231_set_address_long(addr);
+}
+
+static inline void do_set_pan_id(uint16_t pan) {
+    at86rf231_set_pan(pan);
+}
+
+/**
+ * AT86RF231 low-level radio driver definition.
+ */
+extern const ieee802154_radio_driver_t at86rf231_radio_driver;
 
 #endif

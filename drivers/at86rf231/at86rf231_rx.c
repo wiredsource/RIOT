@@ -23,6 +23,14 @@ at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
 uint8_t buffer[AT86RF231_RX_BUF_SIZE][AT86RF231_MAX_PKT_LENGTH];
 volatile uint8_t rx_buffer_next;
 
+/* pointer to the callback low-level function for packet reception */
+static receive_802154_packet_callback_t recv_func = NULL;
+
+void at86rf231_set_recv_callback(receive_802154_packet_callback_t recv_cb)
+{
+    recv_func = recv_cb;
+}
+
 void at86rf231_rx_handler(void)
 {
     uint8_t lqi, fcs_rssi;
@@ -49,6 +57,11 @@ void at86rf231_rx_handler(void)
     if (at86rf231_rx_buffer[rx_buffer_next].crc == 0) {
         DEBUG("Got packet with invalid crc.\n");
         return;
+    }
+
+    /* low-level reception mechanism (for MAC layer, among others) */
+    if (recv_func != NULL) {
+        recv_func(&buf[1], at86rf231_rx_buffer[rx_buffer_next].length - 2, fcs_rssi, lqi, true);
     }
 
     ieee802154_frame_read(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,

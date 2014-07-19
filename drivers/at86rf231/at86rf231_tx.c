@@ -15,6 +15,50 @@ static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);
 
 static uint8_t sequenz_nr;
 
+radio_tx_status_t at86rf231_load_tx_buf(ieee802154_packet_kind_t kind,
+                                        ieee802154_node_addr_t dest,
+                                        bool use_long_addr,
+                                        bool wants_ack,
+                                        void *buf,
+                                        unsigned int len)
+{
+    NOT_IMPL;
+
+    return RADIO_TX_ERROR;
+}
+
+radio_tx_status_t at86rf231_transmit_tx_buf(void)
+{
+    NOT_IMPL;
+
+    return RADIO_TX_ERROR;
+}
+
+radio_tx_status_t at86rf231_do_send(ieee802154_packet_kind_t kind,
+                                    ieee802154_node_addr_t dest,
+                                    bool use_long_addr,
+                                    bool wants_ack,
+                                    void *buf,
+                                    unsigned int len)
+{
+    at86rf231_packet_t p;
+
+    p.frame.fcf.frame_type = kind;
+    if (use_long_addr) {
+        p.frame.fcf.dest_addr_m = IEEE_802154_LONG_ADDR_M;
+        p.frame.fcf.src_addr_m = IEEE_802154_LONG_ADDR_M;
+    }
+    else {
+        p.frame.fcf.dest_addr_m = IEEE_802154_LONG_ADDR_M;
+        p.frame.fcf.src_addr_m = IEEE_802154_LONG_ADDR_M;
+    }
+
+    p.frame.payload = (uint8_t*) buf;
+    p.frame.payload_len = len;
+
+    return at86rf231_send(&p);
+}
+
 int16_t at86rf231_send(at86rf231_packet_t *packet)
 {
     // Set missing frame information

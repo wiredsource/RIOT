@@ -30,10 +30,8 @@ static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
 
-void at86rf231_init(kernel_pid_t tpid)
+void at86rf231_initialize(void)
 {
-    transceiver_pid = tpid;
-
     at86rf231_gpio_spi_interrupts_init();
 
     at86rf231_reset();
@@ -60,6 +58,46 @@ void at86rf231_init(kernel_pid_t tpid)
     radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 56;
 
     at86rf231_switch_to_rx();
+}
+
+void at86rf231_init(kernel_pid_t tpid)
+{
+    transceiver_pid = tpid;
+
+    at86rf231_initialize();
+}
+
+bool at86rf231_on(void)
+{
+    NOT_IMPL;
+
+    /* always on */
+    return true;
+}
+
+void at86rf231_off(void)
+{
+    NOT_IMPL;
+}
+
+bool at86rf231_is_on(void)
+{
+    NOT_IMPL;
+
+    /* always on */
+    return true;
+}
+
+void at86rf231_set_tx_power(int pow)
+{
+    NOT_IMPL;
+}
+
+int at86rf231_get_tx_power(void)
+{
+    NOT_IMPL;
+
+    return -1;
 }
 
 void at86rf231_switch_to_rx(void)
@@ -179,3 +217,43 @@ void at86rf231_set_monitor(uint8_t mode)
     (void) mode;
     // TODO
 }
+
+bool at86rf231_get_monitor(void)
+{
+    NOT_IMPL;
+
+    return false;
+}
+
+bool at86rf231_channel_clear(void)
+{
+    NOT_IMPL;
+
+    return false;
+}
+
+/* at86rf231 low-level radio driver definition */
+const ieee802154_radio_driver_t at86rf231_radio_driver = {
+    .init = at86rf231_initialize,
+    .on = at86rf231_on,
+    .off = at86rf231_off,
+    .is_on = at86rf231_is_on,
+    .load_tx = at86rf231_load_tx_buf,
+    .transmit = at86rf231_transmit_tx_buf,
+    .send = at86rf231_do_send,
+    .set_receive_callback = at86rf231_set_recv_callback,
+    .switch_to_rx = at86rf231_switch_to_rx,
+    .set_channel = do_set_channel,
+    .get_channel = do_get_channel,
+    .set_address = do_set_address,
+    .get_address = at86rf231_get_address,
+    .set_long_address = do_set_long_address,
+    .get_long_address = at86rf231_get_address_long,
+    .set_pan_id = do_set_pan_id,
+    .get_pan_id = at86rf231_get_pan,
+    .set_tx_power = at86rf231_set_tx_power,
+    .get_tx_power = at86rf231_get_tx_power,
+    .channel_is_clear = at86rf231_channel_clear,
+    .set_promiscuous_mode = do_set_monitor,
+    .in_promiscuous_mode = at86rf231_get_monitor
+};
