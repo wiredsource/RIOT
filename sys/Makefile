@@ -40,6 +40,9 @@ endif
 ifneq (,$(filter vtimer,$(USEMODULE)))
     DIRS += vtimer
 endif
+ifneq (,$(filter dummy_tdma,$(USEMODULE)))
+    DIRS += net/link_layer/dummy_tdma
+endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     DIRS += net/link_layer/net_if
 endif

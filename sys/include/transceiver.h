@@ -17,6 +17,13 @@
 /* supported transceivers *
  * NOTE: necessary to include here again due to
  * https://github.com/RIOT-OS/RIOT/issues/117 */
+#ifdef MODULE_DUMMY_TDMA
+#include "dummy_tdma.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_DUMMY_TDMA
+#endif
+#endif
+
 #ifdef MODULE_CC110X
 #include "cc110x.h"
 #ifndef TRANSCEIVER_DEFAULT
@@ -68,6 +75,7 @@
 #define TRANSCEIVER_DEFAULT TRANSCEIVER_AT86RF231
 #endif
 #endif
+
 
 /* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
@@ -133,6 +141,7 @@
 #define TRANSCEIVER_MC1322X     (0x08)      ///< MC1322X transceivers
 #define TRANSCEIVER_NATIVE      (0x10)      ///< NATIVE transceivers
 #define TRANSCEIVER_AT86RF231   (0x20)      ///< AT86RF231 transceivers
+#define TRANSCEIVER_DUMMY_TDMA  (0x40)      ///< dummy TDMA MAC protocol
 
 /**
  * @brief Data type for transceiver specification
@@ -155,6 +164,7 @@ enum transceiver_msg_type_t {
     RCV_PKT_MC1322X,       ///< packet was received by mc1322x transceiver
     RCV_PKT_NATIVE,        ///< packet was received by native transceiver
     RCV_PKT_AT86RF231,     ///< packet was received by AT86RF231 transceiver
+    RCV_PKT_DUMMY_TDMA,    ///< packet was received by dummy TDMA MAC protocol
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer

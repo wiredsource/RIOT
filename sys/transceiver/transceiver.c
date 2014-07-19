@@ -60,6 +60,11 @@
 #include "ieee802154_frame.h"
 #endif
 
+#ifdef MODULE_DUMMY_TDMA
+#include "radio_driver.h"
+#include "dummy_tdma.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
@@ -124,6 +129,9 @@ static void receive_nativenet_packet(radio_packet_t *trans_p);
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(ieee802154_packet_t *trans_p);
 #endif
+#ifdef MODULE_DUMMY_TDMA
+static void receive_dummy_tdma_packet(ieee802154_packet_t *trans_p);
+#endif
 static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int32_t get_channel(transceiver_type_t t);
 static int32_t set_channel(transceiver_type_t t, void *channel);
@@ -169,7 +177,7 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* check if a non defined bit is set */
-    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231)) {
+    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE | TRANSCEIVER_AT86RF231 | TRANSCEIVER_DUMMY_TDMA)) {
         puts("Invalid transceiver type");
     }
     else {
@@ -212,6 +220,17 @@ kernel_pid_t transceiver_start(void)
     else if (transceivers & TRANSCEIVER_AT86RF231) {
         DEBUG("transceiver: Transceiver started for AT86RF231\n");
         at86rf231_init(transceiver_pid);
+    }
+
+#endif
+#ifdef MODULE_DUMMY_TDMA
+    else if (transceivers & TRANSCEIVER_DUMMY_TDMA) {
+        DEBUG("transceiver: Transceiver started for dummy TDMA\n");
+#ifdef MODULE_CC2420
+        dummy_tdma_init(&cc2420_radio_driver);
+#elif defined MODULE_AT86RF231
+        dummy_tdma_init(&at86rf231_radio_driver);
+#endif
     }
 
 #endif
@@ -297,6 +316,7 @@ static void *run(void *arg)
             case RCV_PKT_MC1322X:
             case RCV_PKT_NATIVE:
             case RCV_PKT_AT86RF231:
+            case RCV_PKT_DUMMY_TDMA:
                 receive_packet(m.type, m.content.value);
                 break;
 
@@ -416,6 +436,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
             t = TRANSCEIVER_AT86RF231;
             break;
 
+        case RCV_PKT_DUMMY_TDMA:
+            t = TRANSCEIVER_DUMMY_TDMA;
+            break;
+
         default:
             t = TRANSCEIVER_NONE;
             break;
@@ -465,6 +489,12 @@ static void receive_packet(uint16_t type, uint8_t pos)
 #ifdef MODULE_AT86RF231
             ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_at86rf231_packet(trans_p);
+#endif
+        }
+        else if (type == RCV_PKT_DUMMY_TDMA) {
+#ifdef MODULE_DUMMY_TDMA
+            ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
+            receive_dummy_tdma_packet(trans_p);
 #endif
         }
         else if (type == RCV_PKT_NATIVE) {
@@ -689,6 +719,58 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     DEBUG("Content: %s\n", trans_p->frame.payload);
 }
 #endif
+
+#ifdef MODULE_DUMMY_TDMA
+void receive_dummy_tdma_packet(ieee802154_packet_t *trans_p)
+{
+    DEBUG("Handling dummy TDMA packet\n");
+    dINT();
+#ifdef MODULE_CC2420
+    cc2420_packet_t *p = &cc2420_rx_buffer[rx_buffer_pos];
+#elif defined MODULE_AT86RF231
+    at86rf231_packet_t *p = &at86rf231_rx_buffer[rx_buffer_pos];
+#endif
+    trans_p->length = p->length;
+    trans_p->rssi = p->rssi;
+    trans_p->crc = p->crc;
+    trans_p->lqi = p->lqi;
+    memcpy(&trans_p->frame, &p->frame, p->length);
+#ifdef MODULE_CC2420
+    memcpy(&data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH],
+           p->frame.payload, p->frame.payload_len);
+    trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
+#elif defined MODULE_AT86RF231
+    memcpy(&data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH], p->frame.payload,
+           p->frame.payload_len);
+    trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
+#endif
+    eINT();
+
+#ifdef DEBUG_ENABLED
+
+    if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+        if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            DEBUG("Packet %p was from %" PRIu16 " to %" PRIu16 ", size: %u\n", trans_p, *((uint16_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+        }
+        else {
+            DEBUG("Packet %p was from %016" PRIx64 " to %" PRIu16 ", size: %u\n", trans_p, *((uint64_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+
+        }
+    }
+    else {
+        if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            DEBUG("Packet %p was from %" PRIu16 " to %016" PRIx64 ", size: %u\n", trans_p, *((uint16_t *) &trans_p->frame.src_addr[0]), *((uint64_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+        }
+        else {
+            DEBUG("Packet %p was from %016" PRIx64 " to %016" PRIx64 ", size: %u\n", trans_p, *((uint64_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+
+        }
+    }
+
+#endif
+    DEBUG("Content: %s\n", trans_p->frame.payload);
+}
+#endif
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -784,6 +866,20 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             memcpy(&at86rf231_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
             at86rf231_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
             res = at86rf231_send(&at86rf231_pkt);
+            break;
+#endif
+#ifdef MODULE_DUMMY_TDMA
+
+        case TRANSCEIVER_DUMMY_TDMA:
+#ifdef MODULE_CC2420
+            memcpy(&cc2420_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
+            cc2420_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
+            res = dummy_tdma_send(&cc2420_pkt);
+#elif defined MODULE_AT86RF231
+            memcpy(&at86rf231_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
+            at86rf231_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
+            res = dummy_tdma_send(&at86rf231_pkt);
+#endif
             break;
 #endif
 
