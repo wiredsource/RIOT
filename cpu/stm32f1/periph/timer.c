@@ -78,6 +78,8 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
     /* set timer to run in counter mode */
     timer->CR1 |= TIM_CR1_URS;
+    timer->DIER &= ~(TIM_DIER_UIE);
+    // timer->CR1 |= TIM_CR1_UDIS;
 
     /* set auto-reload and prescaler values and load new values */
     timer->ARR = TIMER_0_MAX_VALUE;
@@ -317,9 +319,11 @@ __attribute__ ((naked)) void TIMER_1_ISR(void)
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
 {
     if (dev->SR & TIM_SR_UIF) {
-        DEBUG("Overflow.\n");
+        DEBUG("Overflow. SR: %x\n", dev->SR);
         dev->SR &= ~(TIM_SR_UIF|TIM_SR_CC1IF|TIM_SR_CC2IF|TIM_SR_CC3IF|TIM_SR_CC4IF);
-        return;
+        config[timer].cb(-1);
+        dev->CCR4 = 0x500;
+        DEBUG("CC1: %x CC2: %x CC3: %x CC4: %x\n", dev->CCR1, dev->CCR2, dev->CCR3, dev->CCR4);
     }
     if (dev->SR & TIM_SR_CC1IF) {
         DEBUG("1\n");

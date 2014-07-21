@@ -39,7 +39,7 @@
 /* Timer 1 configuration */
 #define TIMER_1_DEV         TIM3
 #define TIMER_1_CHANNELS    2
-#define TIMER_1_PRESCALER   (36000U)
+#define TIMER_1_PRESCALER   (2303U)
 #define TIMER_1_MAX_VALUE   (0xffff)
 #define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM3EN)
 #define TIMER_1_ISR         isr_tim3
