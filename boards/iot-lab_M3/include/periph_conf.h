@@ -282,5 +282,20 @@
 #define SPI_BR_PRESCALER_256        (0x0038)
 #define SPI_1ST_BIT_MSB             (0x0000)
 
+/**
+ * @name Real time counter configuration
+ * @{
+ */
+#define RTT_NUMOF           (1U)
+#define RTT_IRQ_PRIO        1
+
+#define RTT_DEV             RTC
+#define RTT_IRQ             RTC_IRQn
+#define RTT_ISR             isr_rtc
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_FREQUENCY       (1)             /* in Hz */
+#define RTT_PRESCALER       (0x7fff)        /* run with 1 Hz */
+/** @} */
+
 #endif /* __PERIPH_CONF_H */
 /** @} */
