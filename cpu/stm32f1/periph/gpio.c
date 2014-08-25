@@ -590,9 +590,9 @@ void gpio_irq_enable(gpio_t dev)
             exti_line = GPIO_15_EXTI_LINE;
             break;
 #endif
+        default:
+            return;
     }
-    /* save state */
-    // int state = (EXTI->IMR & (1 << exti_line) >> exti_line);
 
     /* unmask the pins interrupt channel */
     EXTI->IMR |= (1 << exti_line);
@@ -685,9 +685,9 @@ void gpio_irq_disable(gpio_t dev)
             exti_line = GPIO_15_EXTI_LINE;
             break;
 #endif
+        default:
+            return;
     }
-    // /* save state */
-    // int state = ((EXTI->IMR & (1 << exti_line)) >> exti_line);
 
     /* unmask the pins interrupt channel */
     EXTI->IMR &= ~(1 << exti_line);

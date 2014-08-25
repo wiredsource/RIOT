@@ -59,6 +59,11 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         case SPI_SPEED_100KHZ:
             br_div = SPI_BR_PRESCALER_256;    /* actual speed: 200kHz */
     }
+    /* SPI2 is driven by 36MHz instead of 72MHz
+       => decrease prescaler by one             */
+    if (SPIx == SPI2) {
+        br_div -= 0x0008;
+    }
 
     /* set up SPI */
     SPIx->CR1 = SPI_2_LINES_FULL_DUPLEX \

@@ -32,6 +32,7 @@
 #include "kernel.h"
 #include "irq.h"
 #include "periph/uart.h"
+#include "board.h"
 
 /**
  * manage the heap
@@ -46,9 +47,9 @@ caddr_t heap_top = (caddr_t)&_end + 4;
 void _init(void)
 {
 #ifdef MODULE_UART0
-    uart_init(UART_0, 115200, NULL, NULL, NULL);
+    uart_init(STDIO, STDIO_BAUDRATE, NULL, NULL, NULL);
 #else
-    uart_init_blocking(UART_0, 115200);
+    uart_init_blocking(STDIO, STDIO_BAUDRATE);
 #endif
 }
 
@@ -157,7 +158,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
     char c;
     char *buff = (char*)buffer;
-    uart_read_blocking(UART_0, &c);
+    uart_read_blocking(STDIO, &c);
     buff[0] = c;
     return 1;
 }
@@ -181,7 +182,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     char *c = (char*)data;
     for (int i = 0; i < count; i++) {
-        uart_write_blocking(UART_0, c[i]);
+        uart_write_blocking(STDIO, c[i]);
     }
     return count;
 }
