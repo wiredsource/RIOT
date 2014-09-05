@@ -14,9 +14,9 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm -p
-export FLASHER = $(RIOTBOARD)/hikob_common/dist/flash.sh
-export DEBUGGER = $(RIOTBOARD)/hikob_common/dist/debug.sh
-export RESET = $(RIOTBOARD)/hikob_common/dist/reset.sh
+export FLASHER = $(RIOTBOARD)/hikob-common/dist/flash.sh
+export DEBUGGER = $(RIOTBOARD)/hikob-common/dist/debug.sh
+export RESET = $(RIOTBOARD)/hikob-common/dist/reset.sh
 
 # define build specific options
 export CPU_USAGE = -mcpu=cortex-m3

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_hikob_common
+ * @ingroup     board_hikob-common
  * @{
  *
  * @file        system_stm32f1.c

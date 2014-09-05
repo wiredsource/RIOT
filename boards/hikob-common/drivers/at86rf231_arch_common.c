@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_hikob_common
+ * @ingroup     board_hikob-common
  * @{
  *
  * @file        at86rf231_arch_common.c
