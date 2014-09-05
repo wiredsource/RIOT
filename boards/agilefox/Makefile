@@ -1,5 +1,6 @@
 MODULE =$(BOARD)_base
 
-DIRS = drivers
+DIRS += $(RIOTBOARD)/$(BOARD)/drivers
+DIRS += $(RIOTBOARD)/hikob_common
 
 include $(RIOTBASE)/Makefile.base

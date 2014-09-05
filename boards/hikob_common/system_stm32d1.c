@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_agilefox
+ * @ingroup     board_iot-lab_M3
  * @{
  *
  * @file        system_stm32f1.c
