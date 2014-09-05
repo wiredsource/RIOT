@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     board_hikob_common
  * @{
  *
  * @file        system_stm32f1.c

@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     board_iot-lab_M3
+ * @ingroup     board_hikob_common
  * @{
  *
- * @file        at86rf231_driver.c
+ * @file        at86rf231_arch_common.c
  * @brief       Board specific implementations for the at86rf231 radio driver
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

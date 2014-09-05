@@ -1,5 +1,5 @@
 MODULE =$(BOARD)_base
 
-DIRS = drivers
+DIRS =drivers
 
 include $(RIOTBASE)/Makefile.base
