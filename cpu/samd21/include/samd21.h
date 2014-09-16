@@ -237,9 +237,9 @@ void I2S_Handler                 ( void );
  * \brief CMSIS includes
  */
 
-#include <core_cm0.h>
+#include <core_cm0plus.h>
 #if !defined DONT_USE_CMSIS_INIT
-#include "system_samr21.h"
+#include "system_samd21.h"
 #endif /* DONT_USE_CMSIS_INIT */
 
 /*@}*/
