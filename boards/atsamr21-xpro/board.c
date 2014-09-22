@@ -62,29 +62,22 @@ void led_init(void)
 void clk_init(void)
 {
     PM->APBAMASK.reg |= PM_APBAMASK_SYSCTRL;
+    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
+
     SYSCTRL->OSC8M.bit.PRESC = 0;
     SYSCTRL->OSC8M.bit.ONDEMAND = 1;
     SYSCTRL->OSC8M.bit.RUNSTDBY = 0;
     SYSCTRL->OSC8M.bit.ENABLE = 1;
 
-    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
     /* Software reset the module to ensure it is re-initialized correctly */
     GCLK->CTRL.reg = GCLK_CTRL_SWRST;
     while (GCLK->CTRL.reg & GCLK_CTRL_SWRST);
-
-    PM->CPUSEL.reg = (uint32_t)0x0;
-    PM->APBASEL.reg = (uint32_t)0x0;
-    PM->APBBSEL.reg = (uint32_t)0x0;
 
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
     /* Select the correct generator */
     *((uint8_t*)&GCLK->GENDIV.reg) = 0;
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    GCLK->GENDIV.reg = 0x00000100;
+
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC8M | GCLK_CLKCTRL_GEN_GCLK0);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    *((uint8_t*)&GCLK->GENCTRL.reg) = GCLK_CLKCTRL_GEN_GCLK0;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC8M);
-    // while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    // GCLK->GENCTRL.reg = GCLK_GENCTRL_GENEN;
 }

@@ -67,8 +67,12 @@
 #define UART_0_IRQ          SERCOM0_IRQn
 #define UART_0_ISR          isr_sercom0
 /* UART 0 pin configuration */
-#define UART_0_PORT         PORT->Group[0]
+#define UART_0_PORT         (PORT->Group[0])
+#define UART_0_TX_PIN       PIN_PA04
+#define UART_0_RX_PIN       PIN_PA05
 #define UART_0_PINS         (PORT_PA04 | PORT_PA05)
+#define UART_0_REF_F        (8000000UL)
+
 
 /* UART 1 device configuration */
 #define UART_1_DEV
