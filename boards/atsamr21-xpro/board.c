@@ -77,7 +77,6 @@ void clk_init(void)
     /* Select the correct generator */
     *((uint8_t*)&GCLK->GENDIV.reg) = 0;
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC8M | GCLK_CLKCTRL_GEN_GCLK0);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
 }

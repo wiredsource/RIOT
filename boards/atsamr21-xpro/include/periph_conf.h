@@ -29,25 +29,22 @@
 #define TIMER_2_EN          1
 
 /* Timer 0 configuration */
-#define TIMER_0_DEV         TCC0
-#define TIMER_0_CHANNELS    6
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_ISR1        isr_tcc0
-// #define TIMER_0_ISR2        isr_tc1
+#define TIMER_0_DEV         TC3->COUNT16
+#define TIMER_0_CHANNELS    2
+#define TIMER_0_MAX_VALUE   (0xffff)
+#define TIMER_0_ISR         isr_tc3
 
 /* Timer 1 configuration */
-#define TIMER_1_DEV         TCC1
-#define TIMER_1_CHANNELS    6
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_ISR1        isr_tcc1
-// #define TIMER_1_ISR2        isr_tc4
+#define TIMER_1_DEV         TC4->COUNT16
+#define TIMER_1_CHANNELS    2
+#define TIMER_1_MAX_VALUE   (0xffff)
+#define TIMER_1_ISR         isr_tc4
 
 /* Timer 2 configuration */
-#define TIMER_2_DEV         TCC2
-#define TIMER_2_CHANNELS    6
-#define TIMER_2_MAX_VALUE   (0xffffffff)
-#define TIMER_2_ISR1        isr_tcc2
-// #define TIMER_2_ISR2        isr_tc7
+#define TIMER_2_DEV         TC5->COUNT16
+#define TIMER_2_CHANNELS    2
+#define TIMER_2_MAX_VALUE   (0xffff)
+#define TIMER_2_ISR         isr_tc5
 /** @} */
 
 
