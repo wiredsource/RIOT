@@ -44,7 +44,9 @@ GPIO
 void at86rf231_gpio_spi_interrupts_init(void)
 {
     /* set up GPIO pins */
-    /* SCLK and MOSI*/
+    /* SCLK and MOSI
+     * reset and configure as alternate function output open-drain
+     * with max frequency of 10 MHz */
     GPIOB->CRH &= ~(0xf << (5 * 4));
     GPIOB->CRH |= (0xb << (5 * 4));
     GPIOB->CRH &= ~(0xf << (7 * 4));
