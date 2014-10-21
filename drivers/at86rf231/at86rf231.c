@@ -26,10 +26,10 @@
 #include "periph/spi.h"
 #include "kernel_types.h"
 #include "transceiver.h"
-#include "vtimer.h"
+#include "hwtimer.h"
 #include "hwtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static uint16_t radio_pan;
@@ -101,6 +101,7 @@ void at86rf231_switch_to_rx(void)
 
     do {
         status = at86rf231_get_status();
+        hwtimer_wait(HWTIMER_TICKS(10));
         hwtimer_wait(HWTIMER_TICKS(10));
 
         if (!--max_wait) {
@@ -217,7 +218,7 @@ void at86rf231_gpio_spi_interrupts_init(void)
     /* SPI init */
     spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
     /* IRQ0 */
-    gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, at86rf231_rx_irq, NULL);
+    gpio_init_int(AT86RF231_INT, GPIO_PULLDOWN, GPIO_RISING, at86rf231_rx_irq, NULL);
     /* CS */
     gpio_init_out(AT86RF231_CS, GPIO_NOPULL);
     /* SLEEP */
@@ -236,9 +237,8 @@ void at86rf231_reset(void)
     gpio_clear(AT86RF231_SLEEP);
 
     /* additional waiting to comply to min rst pulse width */
-    uint8_t delay = 50;
-    while (delay--){}
-
+    uint8_t volatile delay = 50; /* volatile to ensure it isn't optimized away */
+    while (--delay);
     gpio_set(AT86RF231_RESET);
 
     /* Send a FORCE TRX OFF command */
@@ -258,4 +258,3 @@ void at86rf231_reset(void)
     } while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
              != AT86RF231_TRX_STATUS__TRX_OFF);
 }
-
